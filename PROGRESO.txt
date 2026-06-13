@@ -1,0 +1,30 @@
+## Avance integrante 2 - Parte jugable
+
+Se implementó la base jugable del proyecto Defensa y Asalto de Base en Python con Tkinter.
+
+Funcionalidades completadas:
+
+- Clases Faccion, Torre, Unidad, Muro y BaseCentral.
+- Facciones Medieval, Futurista y Oscura.
+- Validación para impedir que defensor y atacante usen la misma facción.
+- Catálogo de 3 torres: Básica, Pesada y Mágica.
+- Catálogo de 3 unidades: Soldado, Tanque y Unidad Rápida.
+- Mapa 10x10 con base central fija en la posición (5,5).
+- Interfaz Tkinter para visualizar el mapa.
+- Fase defensor para colocar muros y torres.
+- Fase atacante para colocar unidades.
+- Sistema de dinero para defensor y atacante.
+- Botón para ejecutar combate.
+- Lógica básica de combate: torres atacan unidades, unidades avanzan hacia la base, atacan muros/torres/base y se determina ganador.
+- Sistema de rondas con marcador hasta que un jugador gana 3 rondas.
+- Botón de siguiente ronda.
+- Modo vender/quitar para corregir objetos colocados antes del combate.
+- Pantalla previa para seleccionar facción del defensor y del atacante.
+
+Último avance realizado:
+
+Se agregó la pantalla de selección de facciones antes de abrir el mapa. La pantalla permite elegir facción para defensor y atacante. Si ambos escogen la misma facción, el sistema muestra error. Si las facciones son diferentes, se reinicia el estado de la partida y se abre el mapa con las facciones seleccionadas.
+
+Siguiente paso:
+
+Integrar esta parte jugable con el login, registro, ranking y actualización de victorias.
