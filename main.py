@@ -1245,6 +1245,10 @@ RONDAS_PARA_GANAR = 3
 COLOR_FONDO_APP = "#EDE7DD"
 COLOR_PANEL = "#F8F5F0"
 COLOR_BORDE = "#C7B8A3"
+COLOR_CASILLA_VACIA = "#F4EFE6"
+COLOR_CASILLA_BORDE = "#B8A98F"
+COLOR_TEXTO_CLARO = "white"
+COLOR_TEXTO_OSCURO = "#2F2A24"
 COLOR_TEXTO = "#2F2A24"
 COLOR_TITULO = "#5A4A3A"
 COLOR_BOTON = "#8C6A43"
@@ -1738,21 +1742,27 @@ def reiniciar_estado_partida():
     global defensa_seleccionada
     global unidad_seleccionada
     global modo_venta
+    global combate_en_progreso
+    global turno_combate_actual
+    global efectos_combate_pendientes
 
     mapa_juego, base_central_actual = crear_mapa_inicial()
 
     dinero_defensor = DINERO_INICIAL_DEFENSOR
     dinero_atacante = DINERO_INICIAL_ATACANTE
-
+    combate_en_progreso = False
+    turno_combate_actual = 1
     numero_ronda = 1
     rondas_ganadas_defensor = 0
     rondas_ganadas_atacante = 0
     partida_terminada = False
-
+    efectos_combate_pendientes = []
+    limpiar_efectos_combate()
     fase_actual = "defensor"
     defensa_seleccionada = None
     unidad_seleccionada = None
     modo_venta = False
+
 
 # -------------------------
 # Estado de la ronda actual
@@ -1762,6 +1772,11 @@ fase_actual = "defensor"
 defensa_seleccionada = None
 unidad_seleccionada = None
 modo_venta = False
+turno_combate_actual = 1
+combate_en_progreso = False
+VELOCIDAD_ANIMACION_COMBATE = 1000
+efectos_combate_pendientes = []
+DURACION_EFECTO_DISPARO = 900
 
 etiqueta_estado = None
 etiqueta_mensaje = None
@@ -1771,8 +1786,10 @@ etiqueta_info_atacante = None
 boton_siguiente_ronda = None
 boton_reiniciar_ronda = None
 boton_salir = None
-
 ventana_juego_actual = None
+
+boton_vender_defensor = None
+boton_vender_atacante = None
 
 botones_defensor = []
 botones_atacante = []
@@ -1782,50 +1799,58 @@ botones_atacante = []
 # -------------------------
 
 botones_mapa = []
-
+canvas_mapa = None
+TAMANIO_CASILLA = 58
+MARGEN_DIBUJO = 6
 
 # Función para obtener el texto visual de una casilla
 # Entradas: objeto guardado en una casilla
-# Salidas: texto que se mostrará en el botón
+# Salidas: texto decorado que se mostrará en el botón
 def obtener_texto_casilla(objeto):
     if objeto is None:
         return ""
 
     if isinstance(objeto, BaseCentral):
-        return "BASE"
+        return f"🏰\nBASE\n{objeto.vida}HP"
+
+    if isinstance(objeto, Muro):
+        return f"🧱\nMURO\n{objeto.vida}HP"
 
     if isinstance(objeto, Torre):
         if objeto.nombre == "Torre Básica":
-            return "TB"
-        elif objeto.nombre == "Torre Pesada":
-            return "TP"
-        elif objeto.nombre == "Torre Mágica":
-            return "TM"
-        else:
-            return "T"
+            return f"🏹\nBÁSICA\n{objeto.vida}HP"
 
-    if isinstance(objeto, Muro):
-        return "M"
+        elif objeto.nombre == "Torre Pesada":
+            return f"🛡\nPESADA\n{objeto.vida}HP"
+
+        elif objeto.nombre == "Torre Mágica":
+            return f"🔮\nMÁGICA\n{objeto.vida}HP"
+
+        else:
+            return f"🗼\nTORRE\n{objeto.vida}HP"
 
     if isinstance(objeto, Unidad):
         if objeto.nombre == "Soldado":
-            return "S"
+            return f"⚔\nSOLDADO\n{objeto.vida}HP"
+
         elif objeto.nombre == "Tanque":
-            return "TQ"
+            return f"🚜\nTANQUE\n{objeto.vida}HP"
+
         elif objeto.nombre == "Unidad Rápida":
-            return "UR"
+            return f"🏃\nRÁPIDA\n{objeto.vida}HP"
+
         else:
-            return "U"
+            return f"👤\nUNIDAD\n{objeto.vida}HP"
 
     return "?"
 
 
 # Función para obtener el color visual de una casilla
 # Entradas: objeto guardado en una casilla
-# Salidas: color que se usará en el botón
+# Salidas: color de fondo que se usará en el botón
 def obtener_color_casilla(objeto):
     if objeto is None:
-        return "white"
+        return COLOR_CASILLA_VACIA
 
     if isinstance(objeto, BaseCentral):
         return faccion_defensor_actual.color_base
@@ -1834,12 +1859,12 @@ def obtener_color_casilla(objeto):
         return faccion_defensor_actual.color_torre
 
     if isinstance(objeto, Muro):
-        return faccion_defensor_actual.color_muro
+        return "#8E8578"
 
     if isinstance(objeto, Unidad):
         return faccion_atacante_actual.color_unidad
 
-    return "white"
+    return COLOR_CASILLA_VACIA
 
 # Función para cambiar el estado de una lista de botones
 # Entradas: lista de botones y estado deseado
@@ -1959,6 +1984,10 @@ def reiniciar_ronda_actual():
     global defensa_seleccionada
     global unidad_seleccionada
     global modo_venta
+    global combate_en_progreso
+    global turno_combate_actual
+    global efectos_combate_pendientes
+
 
     if partida_terminada:
         etiqueta_mensaje.config(text="La partida ya terminó. No se puede reiniciar la ronda.")
@@ -1968,6 +1997,11 @@ def reiniciar_ronda_actual():
 
     dinero_defensor = DINERO_INICIAL_DEFENSOR + ((numero_ronda - 1) * BONO_DINERO_POR_RONDA)
     dinero_atacante = DINERO_INICIAL_ATACANTE + ((numero_ronda - 1) * BONO_DINERO_POR_RONDA)
+
+    combate_en_progreso = False
+    turno_combate_actual = 1
+    efectos_combate_pendientes = []
+    limpiar_efectos_combate()
 
     fase_actual = "defensor"
     defensa_seleccionada = None
@@ -1992,6 +2026,15 @@ def jugar_otra_partida(ventana_resultado):
     global botones_defensor
     global botones_atacante
     global botones_mapa
+    global canvas_mapa
+    global efectos_combate_pendientes
+    global combate_en_progreso
+    global turno_combate_actual
+    global boton_vender_defensor
+    global boton_vender_atacante
+
+    boton_vender_defensor = None
+    boton_vender_atacante = None
 
     if ventana_resultado is not None:
         ventana_resultado.destroy()
@@ -2000,7 +2043,10 @@ def jugar_otra_partida(ventana_resultado):
         ventana_juego_actual.destroy()
 
     ventana_juego_actual = None
-
+    canvas_mapa = None
+    efectos_combate_pendientes = []
+    combate_en_progreso = False
+    turno_combate_actual = 1
     etiqueta_estado = None
     etiqueta_mensaje = None
     etiqueta_info_defensor = None
@@ -2144,31 +2190,1309 @@ def actualizar_estado_visual():
     actualizar_botones_por_fase()
 
 
+
+# Función para obtener el color del texto de una casilla
+# Entradas: objeto guardado en una casilla
+# Salidas: color del texto que se mostrará en el botón
+def obtener_color_texto_casilla(objeto):
+    color_fondo = obtener_color_casilla(objeto)
+
+    if color_es_oscuro(color_fondo):
+        return COLOR_TEXTO_CLARO
+
+    return COLOR_TEXTO_OSCURO
+
+# Función para revisar si un color hexadecimal es oscuro
+# Entradas: color hexadecimal
+# Salidas: True si el color es oscuro, False si es claro
+def color_es_oscuro(color_hex):
+    if not isinstance(color_hex, str):
+        return False
+
+    if not color_hex.startswith("#"):
+        return False
+
+    if len(color_hex) != 7:
+        return False
+
+    rojo = int(color_hex[1:3], 16)
+    verde = int(color_hex[3:5], 16)
+    azul = int(color_hex[5:7], 16)
+
+    brillo = (rojo * 299 + verde * 587 + azul * 114) / 1000
+
+    return brillo < 130
+
+
+# Función para obtener el color del texto de una casilla
+# Entradas: objeto guardado en una casilla
+# Salidas: color del texto que se mostrará en el botón
+def obtener_color_texto_casilla(objeto):
+    color_fondo = obtener_color_casilla(objeto)
+
+    if color_es_oscuro(color_fondo):
+        return COLOR_TEXTO_CLARO
+
+    return COLOR_TEXTO_OSCURO
+
+
+# Función para obtener coordenadas visuales de una casilla
+# Entradas: fila y columna de la matriz
+# Salidas: coordenadas x1, y1, x2, y2 para dibujar en Canvas
+def obtener_coordenadas_casilla(fila, columna):
+    x1 = columna * TAMANIO_CASILLA
+    y1 = fila * TAMANIO_CASILLA
+    x2 = x1 + TAMANIO_CASILLA
+    y2 = y1 + TAMANIO_CASILLA
+
+    return x1, y1, x2, y2
+
+# Función para obtener el centro visual de una casilla
+# Entradas: fila y columna de la casilla
+# Salidas: coordenadas x, y del centro de la casilla
+def obtener_centro_casilla(fila, columna):
+    x1, y1, x2, y2 = obtener_coordenadas_casilla(fila, columna)
+
+    centro_x = (x1 + x2) // 2
+    centro_y = (y1 + y2) // 2
+
+    return centro_x, centro_y
+
+
+# Función para guardar un efecto visual de disparo de torre
+# Entradas: posición de torre, posición de objetivo y nombre de torre
+# Salidas: ninguna, agrega el efecto a la lista pendiente
+def agregar_efecto_disparo_torre(fila_torre, columna_torre, fila_objetivo, columna_objetivo, nombre_torre):
+    efecto = {
+        "tipo": "disparo_torre",
+        "fila_torre": fila_torre,
+        "columna_torre": columna_torre,
+        "fila_objetivo": fila_objetivo,
+        "columna_objetivo": columna_objetivo,
+        "nombre_torre": nombre_torre
+    }
+
+    efectos_combate_pendientes.append(efecto)
+
+# Función para dibujar un efecto de ataque de unidad
+# Entradas: datos del efecto de ataque
+# Salidas: ninguna, dibuja una marca de impacto sobre el objetivo
+def dibujar_efecto_ataque_unidad(efecto):
+    fila_unidad = efecto["fila_unidad"]
+    columna_unidad = efecto["columna_unidad"]
+    fila_objetivo = efecto["fila_objetivo"]
+    columna_objetivo = efecto["columna_objetivo"]
+    nombre_unidad = efecto["nombre_unidad"]
+    objetivo_original = efecto["objetivo"]
+
+    if not posicion_en_rango(fila_objetivo, columna_objetivo):
+        return
+
+    objetivo_actual = mapa_juego[fila_objetivo][columna_objetivo]
+
+    if objetivo_actual is not objetivo_original:
+        return
+    
+    x_inicio, y_inicio = obtener_centro_casilla(fila_unidad, columna_unidad)
+    x_fin, y_fin = obtener_centro_casilla(fila_objetivo, columna_objetivo)
+
+    color_efecto = "#C0392B"
+    grosor_efecto = 3
+
+    if nombre_unidad == "Tanque":
+        color_efecto = "#2F2A24"
+        grosor_efecto = 5
+
+    elif nombre_unidad == "Unidad Rápida":
+        color_efecto = "#D98C24"
+        grosor_efecto = 3
+
+    canvas_mapa.create_line(
+        x_inicio,
+        y_inicio,
+        x_fin,
+        y_fin,
+        fill=color_efecto,
+        width=grosor_efecto,
+        tags="efecto_combate"
+    )
+
+    canvas_mapa.create_line(
+        x_fin - 10,
+        y_fin - 10,
+        x_fin + 10,
+        y_fin + 10,
+        fill=color_efecto,
+        width=grosor_efecto,
+        tags="efecto_combate"
+    )
+
+    canvas_mapa.create_line(
+        x_fin + 10,
+        y_fin - 10,
+        x_fin - 10,
+        y_fin + 10,
+        fill=color_efecto,
+        width=grosor_efecto,
+        tags="efecto_combate"
+    )
+
+    canvas_mapa.create_oval(
+        x_fin - 13,
+        y_fin - 13,
+        x_fin + 13,
+        y_fin + 13,
+        outline=color_efecto,
+        width=2,
+        tags="efecto_combate"
+    )
+
+
+# Función para dibujar un efecto visual de habilidad
+# Entradas: datos del efecto de habilidad
+# Salidas: ninguna, dibuja el efecto sobre la casilla
+def dibujar_efecto_habilidad(efecto):
+    tipo_habilidad = efecto["tipo_habilidad"]
+    fila = efecto["fila"]
+    columna = efecto["columna"]
+
+    x, y = obtener_centro_casilla(fila, columna)
+
+    if tipo_habilidad == "congelar":
+        canvas_mapa.create_oval(
+            x - 20,
+            y - 20,
+            x + 20,
+            y + 20,
+            outline="#4DB6E2",
+            width=4,
+            tags="efecto_combate"
+        )
+
+        canvas_mapa.create_text(
+            x,
+            y,
+            text="❄",
+            font=("Arial", 22, "bold"),
+            fill="#4DB6E2",
+            tags="efecto_combate"
+        )
+
+    elif tipo_habilidad == "escudo":
+        canvas_mapa.create_oval(
+            x - 23,
+            y - 23,
+            x + 23,
+            y + 23,
+            outline="#3498DB",
+            width=4,
+            tags="efecto_combate"
+        )
+
+        canvas_mapa.create_text(
+            x,
+            y,
+            text="🛡",
+            font=("Arial", 18, "bold"),
+            fill="#3498DB",
+            tags="efecto_combate"
+        )
+
+    elif tipo_habilidad == "velocidad":
+        canvas_mapa.create_line(
+            x - 24,
+            y - 12,
+            x + 10,
+            y - 12,
+            fill="#F39C12",
+            width=3,
+            tags="efecto_combate"
+        )
+
+        canvas_mapa.create_line(
+            x - 28,
+            y,
+            x + 14,
+            y,
+            fill="#F39C12",
+            width=3,
+            tags="efecto_combate"
+        )
+
+        canvas_mapa.create_line(
+            x - 24,
+            y + 12,
+            x + 10,
+            y + 12,
+            fill="#F39C12",
+            width=3,
+            tags="efecto_combate"
+        )
+
+    elif tipo_habilidad == "ataque_doble":
+        canvas_mapa.create_text(
+            x,
+            y - 10,
+            text="x2",
+            font=("Arial", 18, "bold"),
+            fill="#C0392B",
+            tags="efecto_combate"
+        )
+
+        canvas_mapa.create_oval(
+            x - 18,
+            y - 18,
+            x + 18,
+            y + 18,
+            outline="#C0392B",
+            width=3,
+            tags="efecto_combate"
+        )
+
+# Función para guardar un efecto visual de ataque de unidad
+# Entradas: posición de unidad, posición del objetivo, nombre de unidad y objetivo atacado
+# Salidas: ninguna, agrega el efecto a la lista pendiente
+def agregar_efecto_ataque_unidad(fila_unidad, columna_unidad, fila_objetivo, columna_objetivo, nombre_unidad, objetivo):
+    efecto = {
+        "tipo": "ataque_unidad",
+        "fila_unidad": fila_unidad,
+        "columna_unidad": columna_unidad,
+        "fila_objetivo": fila_objetivo,
+        "columna_objetivo": columna_objetivo,
+        "nombre_unidad": nombre_unidad,
+        "objetivo": objetivo
+    }
+
+    efectos_combate_pendientes.append(efecto)
+
+# Función para guardar un efecto visual de habilidad
+# Entradas: tipo de habilidad, fila y columna del objetivo
+# Salidas: ninguna, agrega el efecto a la lista pendiente
+def agregar_efecto_habilidad(tipo_habilidad, fila, columna):
+    efecto = {
+        "tipo": "habilidad",
+        "tipo_habilidad": tipo_habilidad,
+        "fila": fila,
+        "columna": columna
+    }
+
+    efectos_combate_pendientes.append(efecto)
+
+# Función para guardar un efecto visual ligado a una unidad
+# Entradas: tipo de habilidad y objeto unidad
+# Salidas: ninguna, agrega el efecto para dibujarlo en la posición actual de la unidad
+def agregar_efecto_habilidad_unidad(tipo_habilidad, unidad):
+    efecto = {
+        "tipo": "habilidad_unidad",
+        "tipo_habilidad": tipo_habilidad,
+        "unidad": unidad
+    }
+
+    efectos_combate_pendientes.append(efecto)
+
+# Función para dibujar una habilidad sobre la posición actual de una unidad
+# Entradas: datos del efecto con referencia a la unidad
+# Salidas: ninguna, dibuja el efecto si la unidad sigue viva en el mapa
+def dibujar_efecto_habilidad_unidad(efecto):
+    unidad = efecto["unidad"]
+    tipo_habilidad = efecto["tipo_habilidad"]
+
+    posicion_unidad = buscar_posicion_unidad_objeto(unidad)
+
+    if posicion_unidad is None:
+        return
+
+    fila_unidad, columna_unidad = posicion_unidad
+
+    efecto_actualizado = {
+        "tipo_habilidad": tipo_habilidad,
+        "fila": fila_unidad,
+        "columna": columna_unidad
+    }
+
+    dibujar_efecto_habilidad(efecto_actualizado)
+
+
+# Función para limpiar los efectos visuales del combate
+# Entradas: ninguna
+# Salidas: ninguna, elimina efectos si el Canvas existe
+def limpiar_efectos_combate():
+    global canvas_mapa
+
+    if canvas_mapa is None:
+        return
+
+    try:
+        if canvas_mapa.winfo_exists():
+            canvas_mapa.delete("efecto_combate")
+
+    except tk.TclError:
+        canvas_mapa = None
+
+
+# Función para dibujar un efecto de disparo según el tipo de torre
+# Entradas: datos del efecto de disparo
+# Salidas: ninguna, dibuja línea y golpe visual
+def dibujar_efecto_disparo_torre(efecto):
+    fila_torre = efecto["fila_torre"]
+    columna_torre = efecto["columna_torre"]
+    fila_objetivo = efecto["fila_objetivo"]
+    columna_objetivo = efecto["columna_objetivo"]
+    nombre_torre = efecto["nombre_torre"]
+
+    x_inicio, y_inicio = obtener_centro_casilla(fila_torre, columna_torre)
+    x_fin, y_fin = obtener_centro_casilla(fila_objetivo, columna_objetivo)
+
+    color_disparo = "#7A3E2B"
+    grosor_disparo = 3
+    estilo_linea = None
+
+    if nombre_torre == "Torre Pesada":
+        color_disparo = "#2F2A24"
+        grosor_disparo = 5
+
+    elif nombre_torre == "Torre Mágica":
+        color_disparo = "#8A4FFF"
+        grosor_disparo = 4
+        estilo_linea = (4, 2)
+
+    canvas_mapa.create_line(
+        x_inicio,
+        y_inicio,
+        x_fin,
+        y_fin,
+        fill=color_disparo,
+        width=grosor_disparo,
+        dash=estilo_linea,
+        tags="efecto_combate"
+    )
+
+    canvas_mapa.create_oval(
+        x_fin - 9,
+        y_fin - 9,
+        x_fin + 9,
+        y_fin + 9,
+        outline=color_disparo,
+        width=3,
+        tags="efecto_combate"
+    )
+
+    canvas_mapa.create_oval(
+        x_fin - 4,
+        y_fin - 4,
+        x_fin + 4,
+        y_fin + 4,
+        fill=color_disparo,
+        outline=color_disparo,
+        tags="efecto_combate"
+    )
+
+
+# Función para dibujar todos los efectos visuales pendientes del combate
+# Entradas: ninguna
+# Salidas: ninguna, dibuja efectos y los limpia después de un tiempo
+def dibujar_efectos_combate_pendientes():
+    global efectos_combate_pendientes
+
+    if canvas_mapa is None:
+        efectos_combate_pendientes = []
+        return
+
+    limpiar_efectos_combate()
+
+    for efecto in efectos_combate_pendientes:
+        if efecto["tipo"] == "disparo_torre":
+            dibujar_efecto_disparo_torre(efecto)
+
+        elif efecto["tipo"] == "ataque_unidad":
+            dibujar_efecto_ataque_unidad(efecto)
+
+        elif efecto["tipo"] == "habilidad":
+            dibujar_efecto_habilidad(efecto)
+
+        elif efecto["tipo"] == "habilidad_unidad":
+            dibujar_efecto_habilidad_unidad(efecto)
+
+    efectos_combate_pendientes = []
+
+    if ventana_juego_actual is not None:
+        ventana_juego_actual.after(DURACION_EFECTO_DISPARO, limpiar_efectos_combate)
+
+# Función para obtener el identificador visual de una casilla
+# Entradas: fila y columna de la matriz
+# Salidas: texto usado como tag dentro del Canvas
+def obtener_tag_casilla(fila, columna):
+    return f"casilla_{fila}_{columna}"
+
+
+# Función para dibujar una casilla vacía del mapa
+# Entradas: fila y columna de la casilla
+# Salidas: ninguna, dibuja el fondo y borde de la casilla
+def dibujar_casilla_canvas(fila, columna):
+    tag_casilla = obtener_tag_casilla(fila, columna)
+    x1, y1, x2, y2 = obtener_coordenadas_casilla(fila, columna)
+
+    if (fila + columna) % 2 == 0:
+        color_fondo = "#F4EFE6"
+    else:
+        color_fondo = "#EFE7DA"
+
+    canvas_mapa.create_rectangle(
+        x1,
+        y1,
+        x2,
+        y2,
+        fill=color_fondo,
+        outline=COLOR_CASILLA_BORDE,
+        width=1,
+        tags=tag_casilla
+    )
+
+
+# Función para obtener la vida máxima de un objeto del juego
+# Entradas: objeto del mapa
+# Salidas: vida máxima registrada del objeto
+def obtener_vida_maxima_objeto(objeto):
+    if hasattr(objeto, "vida_maxima"):
+        return objeto.vida_maxima
+
+    objeto.vida_maxima = objeto.vida
+    return objeto.vida_maxima
+
+
+# Función para dibujar una barra de vida en una casilla
+# Entradas: objeto del juego, coordenadas de casilla y tag visual
+# Salidas: ninguna, dibuja barra de vida en Canvas
+def dibujar_vida_canvas(objeto, x1, y1, x2, y2, tag_casilla):
+    vida_maxima = obtener_vida_maxima_objeto(objeto)
+
+    if vida_maxima <= 0:
+        return
+
+    porcentaje_vida = objeto.vida / vida_maxima
+    porcentaje_vida = max(0, min(1, porcentaje_vida))
+
+    ancho_total = (x2 - x1) - 14
+    ancho_vida = ancho_total * porcentaje_vida
+
+    color_vida = "#2ECC71"
+
+    if porcentaje_vida <= 0.5:
+        color_vida = "#F1C40F"
+
+    if porcentaje_vida <= 0.25:
+        color_vida = "#E74C3C"
+
+    y_barra_1 = y2 - 9
+    y_barra_2 = y2 - 4
+
+    canvas_mapa.create_rectangle(
+        x1 + 7,
+        y_barra_1,
+        x2 - 7,
+        y_barra_2,
+        fill="#D9D1C2",
+        outline=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    if ancho_vida > 0:
+        canvas_mapa.create_rectangle(
+            x1 + 7,
+            y_barra_1,
+            x1 + 7 + ancho_vida,
+            y_barra_2,
+            fill=color_vida,
+            outline="",
+            tags=tag_casilla
+        )
+
+    canvas_mapa.create_text(
+        (x1 + x2) // 2,
+        y2 - 14,
+        text=str(objeto.vida),
+        font=("Arial", 6, "bold"),
+        fill=COLOR_TEXTO_OSCURO,
+        tags=tag_casilla
+    )
+
+
+# Función para dibujar la base central
+# Entradas: objeto base, fila y columna
+# Salidas: ninguna, dibuja la base como castillo
+def dibujar_base_canvas(objeto, fila, columna):
+    tag_casilla = obtener_tag_casilla(fila, columna)
+    x1, y1, x2, y2 = obtener_coordenadas_casilla(fila, columna)
+    color_base = faccion_defensor_actual.color_base
+
+    canvas_mapa.create_rectangle(
+        x1 + 14,
+        y1 + 26,
+        x2 - 14,
+        y2 - 18,
+        fill=color_base,
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_rectangle(
+        x1 + 16,
+        y1 + 16,
+        x1 + 26,
+        y1 + 30,
+        fill=color_base,
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_rectangle(
+        x1 + 34,
+        y1 + 16,
+        x1 + 44,
+        y1 + 30,
+        fill=color_base,
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_rectangle(
+        x2 - 26,
+        y1 + 16,
+        x2 - 16,
+        y1 + 30,
+        fill=color_base,
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_rectangle(
+        x1 + 27,
+        y1 + 38,
+        x2 - 27,
+        y2 - 18,
+        fill="#5A3E2B",
+        outline=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_text(
+        (x1 + x2) // 2,
+        y1 + 8,
+        text="BASE",
+        font=("Arial", 7, "bold"),
+        fill=COLOR_TEXTO_OSCURO,
+        tags=tag_casilla
+    )
+
+    dibujar_vida_canvas(objeto, x1, y1, x2, y2, tag_casilla)
+
+
+# Función para dibujar un muro
+# Entradas: objeto muro, fila y columna
+# Salidas: ninguna, dibuja el muro con bloques
+def dibujar_muro_canvas(objeto, fila, columna):
+    tag_casilla = obtener_tag_casilla(fila, columna)
+    x1, y1, x2, y2 = obtener_coordenadas_casilla(fila, columna)
+
+    canvas_mapa.create_rectangle(
+        x1 + 10,
+        y1 + 18,
+        x2 - 10,
+        y2 - 20,
+        fill="#8E8578",
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    for i in range(3):
+        y_linea = y1 + 25 + (i * 10)
+        canvas_mapa.create_line(
+            x1 + 10,
+            y_linea,
+            x2 - 10,
+            y_linea,
+            fill=COLOR_TEXTO_OSCURO,
+            width=1,
+            tags=tag_casilla
+        )
+
+    canvas_mapa.create_line(
+        x1 + 28,
+        y1 + 18,
+        x1 + 28,
+        y2 - 20,
+        fill=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        x1 + 44,
+        y1 + 18,
+        x1 + 44,
+        y2 - 20,
+        fill=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_text(
+        (x1 + x2) // 2,
+        y1 + 9,
+        text="MURO",
+        font=("Arial", 7, "bold"),
+        fill=COLOR_TEXTO_OSCURO,
+        tags=tag_casilla
+    )
+
+    dibujar_vida_canvas(objeto, x1, y1, x2, y2, tag_casilla)
+
+
+# Función para dibujar una torre básica
+# Entradas: objeto torre, fila y columna
+# Salidas: ninguna, dibuja la torre básica
+def dibujar_torre_basica_canvas(objeto, fila, columna):
+    tag_casilla = obtener_tag_casilla(fila, columna)
+    x1, y1, x2, y2 = obtener_coordenadas_casilla(fila, columna)
+    color_torre = faccion_defensor_actual.color_torre
+
+    canvas_mapa.create_polygon(
+        x1 + 18,
+        y1 + 25,
+        (x1 + x2) // 2,
+        y1 + 10,
+        x2 - 18,
+        y1 + 25,
+        fill="#7A3E2B",
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_rectangle(
+        x1 + 22,
+        y1 + 25,
+        x2 - 22,
+        y2 - 19,
+        fill=color_torre,
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_oval(
+        x1 + 29,
+        y1 + 33,
+        x2 - 29,
+        y1 + 44,
+        fill="#F8F5F0",
+        outline=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_text(
+        (x1 + x2) // 2,
+        y1 + 8,
+        text="BÁSICA",
+        font=("Arial", 7, "bold"),
+        fill=COLOR_TEXTO_OSCURO,
+        tags=tag_casilla
+    )
+
+    dibujar_vida_canvas(objeto, x1, y1, x2, y2, tag_casilla)
+
+
+# Función para dibujar una torre pesada
+# Entradas: objeto torre, fila y columna
+# Salidas: ninguna, dibuja la torre pesada
+def dibujar_torre_pesada_canvas(objeto, fila, columna):
+    tag_casilla = obtener_tag_casilla(fila, columna)
+    x1, y1, x2, y2 = obtener_coordenadas_casilla(fila, columna)
+    color_torre = faccion_defensor_actual.color_torre
+
+    canvas_mapa.create_rectangle(
+        x1 + 17,
+        y1 + 17,
+        x2 - 17,
+        y2 - 19,
+        fill=color_torre,
+        outline=COLOR_TEXTO_OSCURO,
+        width=3,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_rectangle(
+        x1 + 22,
+        y1 + 10,
+        x2 - 22,
+        y1 + 22,
+        fill="#5A4A3A",
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_oval(
+        x1 + 25,
+        y1 + 29,
+        x2 - 25,
+        y1 + 47,
+        fill="#D9D1C2",
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_text(
+        (x1 + x2) // 2,
+        y1 + 8,
+        text="PESADA",
+        font=("Arial", 7, "bold"),
+        fill=COLOR_TEXTO_OSCURO,
+        tags=tag_casilla
+    )
+
+    dibujar_vida_canvas(objeto, x1, y1, x2, y2, tag_casilla)
+
+
+# Función para dibujar una torre mágica
+# Entradas: objeto torre, fila y columna
+# Salidas: ninguna, dibuja la torre mágica
+def dibujar_torre_magica_canvas(objeto, fila, columna):
+    tag_casilla = obtener_tag_casilla(fila, columna)
+    x1, y1, x2, y2 = obtener_coordenadas_casilla(fila, columna)
+    color_torre = faccion_defensor_actual.color_torre
+
+    canvas_mapa.create_rectangle(
+        x1 + 24,
+        y1 + 24,
+        x2 - 24,
+        y2 - 19,
+        fill=color_torre,
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_polygon(
+        (x1 + x2) // 2,
+        y1 + 8,
+        x1 + 20,
+        y1 + 26,
+        (x1 + x2) // 2,
+        y1 + 44,
+        x2 - 20,
+        y1 + 26,
+        fill="#8A4FFF",
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_text(
+        (x1 + x2) // 2,
+        y1 + 8,
+        text="✦",
+        font=("Arial", 9, "bold"),
+        fill="#F8F5F0",
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_text(
+        (x1 + x2) // 2,
+        y1 + 51,
+        text="MÁGICA",
+        font=("Arial", 7, "bold"),
+        fill=COLOR_TEXTO_OSCURO,
+        tags=tag_casilla
+    )
+
+    dibujar_vida_canvas(objeto, x1, y1, x2, y2, tag_casilla)
+
+
+# Función para dibujar una unidad soldado con diseño más detallado
+# Entradas: objeto unidad, fila y columna
+# Salidas: ninguna, dibuja el soldado con armadura, escudo y espada
+def dibujar_soldado_canvas(objeto, fila, columna):
+    tag_casilla = obtener_tag_casilla(fila, columna)
+    x1, y1, x2, y2 = obtener_coordenadas_casilla(fila, columna)
+    color_unidad = faccion_atacante_actual.color_unidad
+
+    centro_x = (x1 + x2) // 2
+
+    canvas_mapa.create_oval(
+        x1 + 18,
+        y1 + 42,
+        x2 - 18,
+        y1 + 48,
+        fill="#B8A98F",
+        outline="",
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_polygon(
+        centro_x - 9,
+        y1 + 20,
+        centro_x + 9,
+        y1 + 20,
+        centro_x + 14,
+        y1 + 39,
+        centro_x,
+        y1 + 46,
+        centro_x - 14,
+        y1 + 39,
+        fill=color_unidad,
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_rectangle(
+        centro_x - 8,
+        y1 + 23,
+        centro_x + 8,
+        y1 + 27,
+        fill="#D9D1C2",
+        outline=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_oval(
+        centro_x - 9,
+        y1 + 8,
+        centro_x + 9,
+        y1 + 24,
+        fill="#D9D1C2",
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_arc(
+        centro_x - 11,
+        y1 + 5,
+        centro_x + 11,
+        y1 + 23,
+        start=0,
+        extent=180,
+        fill="#5A4A3A",
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        centro_x - 5,
+        y1 + 15,
+        centro_x - 2,
+        y1 + 15,
+        fill=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        centro_x + 2,
+        y1 + 15,
+        centro_x + 5,
+        y1 + 15,
+        fill=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_polygon(
+        centro_x - 17,
+        y1 + 24,
+        centro_x - 27,
+        y1 + 28,
+        centro_x - 24,
+        y1 + 43,
+        centro_x - 14,
+        y1 + 39,
+        fill="#C0C0C0",
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        centro_x + 12,
+        y1 + 24,
+        centro_x + 27,
+        y1 + 12,
+        fill="#C0C0C0",
+        width=4,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        centro_x + 14,
+        y1 + 24,
+        centro_x + 29,
+        y1 + 12,
+        fill=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_polygon(
+        centro_x + 27,
+        y1 + 12,
+        centro_x + 31,
+        y1 + 5,
+        centro_x + 23,
+        y1 + 9,
+        fill="#EDE7DD",
+        outline=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        centro_x - 6,
+        y1 + 45,
+        centro_x - 13,
+        y1 + 52,
+        fill=COLOR_TEXTO_OSCURO,
+        width=3,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        centro_x + 6,
+        y1 + 45,
+        centro_x + 13,
+        y1 + 52,
+        fill=COLOR_TEXTO_OSCURO,
+        width=3,
+        tags=tag_casilla
+    )
+
+    dibujar_vida_canvas(objeto, x1, y1, x2, y2, tag_casilla)
+
+
+# Función para dibujar una unidad tanque
+# Entradas: objeto unidad, fila y columna
+# Salidas: ninguna, dibuja el tanque
+def dibujar_tanque_canvas(objeto, fila, columna):
+    tag_casilla = obtener_tag_casilla(fila, columna)
+    x1, y1, x2, y2 = obtener_coordenadas_casilla(fila, columna)
+    color_unidad = faccion_atacante_actual.color_unidad
+
+    canvas_mapa.create_rectangle(
+        x1 + 13,
+        y1 + 30,
+        x2 - 13,
+        y1 + 45,
+        fill="#3D3D3D",
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_rectangle(
+        x1 + 19,
+        y1 + 20,
+        x2 - 22,
+        y1 + 35,
+        fill=color_unidad,
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        x2 - 23,
+        y1 + 26,
+        x2 - 8,
+        y1 + 21,
+        fill=COLOR_TEXTO_OSCURO,
+        width=4,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_oval(
+        x1 + 17,
+        y1 + 38,
+        x1 + 25,
+        y1 + 46,
+        fill="#1F1F1F",
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_oval(
+        x2 - 25,
+        y1 + 38,
+        x2 - 17,
+        y1 + 46,
+        fill="#1F1F1F",
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_text(
+        (x1 + x2) // 2,
+        y1 + 53,
+        text="TANQUE",
+        font=("Arial", 7, "bold"),
+        fill=COLOR_TEXTO_OSCURO,
+        tags=tag_casilla
+    )
+
+    dibujar_vida_canvas(objeto, x1, y1, x2, y2, tag_casilla)
+
+
+# Función para dibujar una unidad rápida con diseño dinámico
+# Entradas: objeto unidad, fila y columna
+# Salidas: ninguna, dibuja la unidad rápida en pose de movimiento
+def dibujar_unidad_rapida_canvas(objeto, fila, columna):
+    tag_casilla = obtener_tag_casilla(fila, columna)
+    x1, y1, x2, y2 = obtener_coordenadas_casilla(fila, columna)
+    color_unidad = faccion_atacante_actual.color_unidad
+
+    centro_x = (x1 + x2) // 2
+
+    canvas_mapa.create_oval(
+        x1 + 14,
+        y1 + 43,
+        x2 - 12,
+        y1 + 49,
+        fill="#B8A98F",
+        outline="",
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        x1 + 5,
+        y1 + 13,
+        x1 + 24,
+        y1 + 13,
+        fill="#A78A6A",
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        x1 + 3,
+        y1 + 24,
+        x1 + 24,
+        y1 + 24,
+        fill="#A78A6A",
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        x1 + 7,
+        y1 + 35,
+        x1 + 25,
+        y1 + 35,
+        fill="#A78A6A",
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_polygon(
+        centro_x - 5,
+        y1 + 22,
+        centro_x - 23,
+        y1 + 31,
+        centro_x - 13,
+        y1 + 40,
+        centro_x + 6,
+        y1 + 30,
+        fill="#7A3E2B",
+        outline=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_oval(
+        centro_x + 1,
+        y1 + 7,
+        centro_x + 18,
+        y1 + 22,
+        fill=color_unidad,
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_arc(
+        centro_x,
+        y1 + 5,
+        centro_x + 20,
+        y1 + 22,
+        start=0,
+        extent=180,
+        fill="#5A4A3A",
+        outline=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_polygon(
+        centro_x + 2,
+        y1 + 24,
+        centro_x + 17,
+        y1 + 21,
+        centro_x + 20,
+        y1 + 35,
+        centro_x + 6,
+        y1 + 39,
+        fill=color_unidad,
+        outline=COLOR_TEXTO_OSCURO,
+        width=2,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        centro_x + 5,
+        y1 + 26,
+        centro_x - 9,
+        y1 + 19,
+        fill=COLOR_TEXTO_OSCURO,
+        width=3,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        centro_x + 15,
+        y1 + 27,
+        centro_x + 28,
+        y1 + 20,
+        fill=COLOR_TEXTO_OSCURO,
+        width=3,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        centro_x + 8,
+        y1 + 39,
+        centro_x - 5,
+        y1 + 51,
+        fill=COLOR_TEXTO_OSCURO,
+        width=3,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        centro_x + 15,
+        y1 + 38,
+        centro_x + 28,
+        y1 + 48,
+        fill=COLOR_TEXTO_OSCURO,
+        width=3,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        centro_x - 8,
+        y1 + 51,
+        centro_x + 1,
+        y1 + 51,
+        fill="#5A4A3A",
+        width=3,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_line(
+        centro_x + 25,
+        y1 + 48,
+        centro_x + 34,
+        y1 + 48,
+        fill="#5A4A3A",
+        width=3,
+        tags=tag_casilla
+    )
+
+    canvas_mapa.create_polygon(
+        centro_x + 18,
+        y1 + 21,
+        centro_x + 28,
+        y1 + 15,
+        centro_x + 24,
+        y1 + 24,
+        fill="#C0C0C0",
+        outline=COLOR_TEXTO_OSCURO,
+        width=1,
+        tags=tag_casilla
+    )
+
+    dibujar_vida_canvas(objeto, x1, y1, x2, y2, tag_casilla)
+
+
+# Función para dibujar cualquier objeto del juego en Canvas
+# Entradas: objeto del juego, fila y columna
+# Salidas: ninguna, dibuja la figura correspondiente
+def dibujar_objeto_canvas(objeto, fila, columna):
+    if objeto is None:
+        return
+
+    if isinstance(objeto, BaseCentral):
+        dibujar_base_canvas(objeto, fila, columna)
+
+    elif isinstance(objeto, Muro):
+        dibujar_muro_canvas(objeto, fila, columna)
+
+    elif isinstance(objeto, Torre):
+        if objeto.nombre == "Torre Básica":
+            dibujar_torre_basica_canvas(objeto, fila, columna)
+
+        elif objeto.nombre == "Torre Pesada":
+            dibujar_torre_pesada_canvas(objeto, fila, columna)
+
+        elif objeto.nombre == "Torre Mágica":
+            dibujar_torre_magica_canvas(objeto, fila, columna)
+
+    elif isinstance(objeto, Unidad):
+        if objeto.nombre == "Soldado":
+            dibujar_soldado_canvas(objeto, fila, columna)
+
+        elif objeto.nombre == "Tanque":
+            dibujar_tanque_canvas(objeto, fila, columna)
+
+        elif objeto.nombre == "Unidad Rápida":
+            dibujar_unidad_rapida_canvas(objeto, fila, columna)
+
+
 # Función para actualizar visualmente una casilla del mapa
 # Entradas: fila y columna de la casilla
-# Salidas: ninguna, actualiza el botón en pantalla
+# Salidas: ninguna, redibuja la casilla en el Canvas
 def actualizar_boton_casilla(fila, columna):
-    objeto = mapa_juego[fila][columna]
+    if canvas_mapa is None:
+        return
 
-    texto = obtener_texto_casilla(objeto)
-    color = obtener_color_casilla(objeto)
+    tag_casilla = obtener_tag_casilla(fila, columna)
 
-    botones_mapa[fila][columna].config(
-        text=texto,
-        bg=color
-    )
+    canvas_mapa.delete(tag_casilla)
+
+    dibujar_casilla_canvas(fila, columna)
+    dibujar_objeto_canvas(mapa_juego[fila][columna], fila, columna)
 
 
 # Función para actualizar todo el mapa visual
 # Entradas: ninguna
-# Salidas: ninguna, actualiza todos los botones del mapa
+# Salidas: ninguna, redibuja el mapa completo en el Canvas
 def actualizar_mapa_visual():
-    for fila in range(TAMANIO_MAPA):
-        for columna in range(TAMANIO_MAPA):
-            actualizar_boton_casilla(fila, columna)
+    if canvas_mapa is not None:
+        canvas_mapa.delete("all")
+
+        for fila in range(TAMANIO_MAPA):
+            for columna in range(TAMANIO_MAPA):
+                dibujar_casilla_canvas(fila, columna)
+                dibujar_objeto_canvas(mapa_juego[fila][columna], fila, columna)
 
     actualizar_estado_visual()
-
 
 # Función para seleccionar una defensa para colocar en el mapa
 # Entradas: tipo de defensa seleccionada
@@ -2185,7 +3509,6 @@ def seleccionar_defensa(tipo_defensa):
     defensa_seleccionada = tipo_defensa
     unidad_seleccionada = None
     modo_venta = False
-
     etiqueta_mensaje.config(text=f"Defensa seleccionada: {tipo_defensa}")
     actualizar_estado_visual()
 
@@ -2298,23 +3621,24 @@ def colocar_unidad(fila, columna):
     actualizar_mapa_visual()
 
 
-# Función para activar el modo de venta o eliminación
+# Función para activar el modo venta
 # Entradas: ninguna
-# Salidas: ninguna, activa el modo venta
+# Salidas: ninguna, deja activo el modo venta hasta cancelar o seleccionar otra acción
 def activar_modo_venta():
     global modo_venta
     global defensa_seleccionada
     global unidad_seleccionada
 
+    if partida_terminada:
+        return
+
     if fase_actual != "defensor" and fase_actual != "atacante":
-        etiqueta_mensaje.config(text="Solo puedes vender durante la fase defensor o atacante.")
         return
 
     modo_venta = True
     defensa_seleccionada = None
     unidad_seleccionada = None
 
-    etiqueta_mensaje.config(text="Modo vender activado. Haz clic sobre el objeto que deseas quitar.")
     actualizar_estado_visual()
 
 
@@ -2342,6 +3666,9 @@ def vender_objeto(fila, columna):
     global dinero_atacante
     global modo_venta
 
+    if not posicion_en_rango(fila, columna):
+        return
+
     if partida_terminada:
         etiqueta_mensaje.config(text="La partida ya terminó. No puedes vender objetos.")
         return
@@ -2364,7 +3691,7 @@ def vender_objeto(fila, columna):
         if isinstance(objeto, Torre) or isinstance(objeto, Muro):
             dinero_defensor += objeto.costo
             mapa_juego[fila][columna] = None
-            modo_venta = False
+    
 
             etiqueta_mensaje.config(
                 text=f"Se vendió {objeto.nombre}. Dinero recuperado: ${objeto.costo}."
@@ -2380,7 +3707,6 @@ def vender_objeto(fila, columna):
         if isinstance(objeto, Unidad):
             dinero_atacante += objeto.costo
             mapa_juego[fila][columna] = None
-            modo_venta = False
 
             etiqueta_mensaje.config(
                 text=f"Se vendió {objeto.nombre}. Dinero recuperado: ${objeto.costo}."
@@ -2467,9 +3793,18 @@ def ejecutar_ataque_torre_con_habilidad(torre, fila_torre, columna_torre):
 
     if posicion_objetivo is None:
         return
+    
 
     fila_unidad, columna_unidad = posicion_objetivo
     unidad = mapa_juego[fila_unidad][columna_unidad]
+
+    agregar_efecto_disparo_torre(
+    fila_torre,
+    columna_torre,
+    fila_unidad,
+    columna_unidad,
+    torre.nombre
+    )
 
     if not isinstance(unidad, Unidad):
         return
@@ -2495,6 +3830,7 @@ def ejecutar_ataque_torre_con_habilidad(torre, fila_torre, columna_torre):
         elif torre.nombre == "Torre Mágica":
             unidad.recibir_danio(torre.danio)
             unidad.turnos_congelada = 1
+            agregar_efecto_habilidad("congelar", fila_unidad, columna_unidad)
 
             registrar_evento_combate(
                 f"Habilidad activada: {torre.nombre} congeló a {unidad.nombre} por 1 turno."
@@ -2556,10 +3892,13 @@ def ejecutar_ataque_torres():
     actualizar_escudos_unidades()
 
 # Función para registrar eventos importantes del combate
-# Entradas: mensaje del evento
-# Salidas: ninguna, muestra el evento en consola
+# Entradas: mensaje descriptivo del evento
+# Salidas: ninguna, muestra el evento en consola y en la interfaz
 def registrar_evento_combate(mensaje):
-    print(mensaje)
+    #print(mensaje)
+
+    if etiqueta_mensaje is not None:
+        etiqueta_mensaje.config(text=mensaje)
 
 
 # Función para obtener posibles pasos hacia la base central
@@ -2604,7 +3943,10 @@ def preparar_habilidad_unidad(unidad):
     if unidad.nombre == "Tanque" and unidad.habilidad_lista():
         unidad.escudo_activo = True
         unidad.turnos_escudo = 1
+        agregar_efecto_habilidad_unidad("escudo", unidad)
+
         unidad.reiniciar_habilidad()
+
 
         registrar_evento_combate(
             f"Habilidad activada: {unidad.nombre} activó Escudo temporal."
@@ -2612,6 +3954,8 @@ def preparar_habilidad_unidad(unidad):
 
     elif unidad.nombre == "Unidad Rápida" and unidad.habilidad_lista():
         unidad.velocidad_extra_temporal = 1
+        agregar_efecto_habilidad_unidad("velocidad", unidad)
+
         unidad.reiniciar_habilidad()
 
         registrar_evento_combate(
@@ -2630,16 +3974,45 @@ def obtener_cantidad_ataques_unidad(unidad):
             f"Habilidad activada: {unidad.nombre} usó Ataque doble."
         )
 
+        agregar_efecto_habilidad_unidad("ataque_doble", unidad)
+
         return 2
 
     return 1
 
+# Función para buscar la posición actual de una unidad específica
+# Entradas: objeto unidad que se desea buscar
+# Salidas: tupla con fila y columna, o None si no existe en el mapa
+def buscar_posicion_unidad_objeto(unidad_buscada):
+    for fila in range(TAMANIO_MAPA):
+        for columna in range(TAMANIO_MAPA):
+            objeto = mapa_juego[fila][columna]
+
+            if objeto is unidad_buscada:
+                return fila, columna
+
+    return None
 
 # Función para hacer que una unidad ataque un objetivo
 # Entradas: unidad, objetivo, fila del objetivo y columna del objetivo
 # Salidas: ninguna, aplica daño al objetivo
 def unidad_ataca_objetivo(unidad, objetivo, fila_objetivo, columna_objetivo):
+    posicion_unidad = buscar_posicion_unidad_objeto(unidad)
+
+    if posicion_unidad is not None:
+        fila_unidad, columna_unidad = posicion_unidad
+
+        agregar_efecto_ataque_unidad(
+            fila_unidad,
+            columna_unidad,
+            fila_objetivo,
+            columna_objetivo,
+            unidad.nombre,
+            objetivo
+        )
+
     cantidad_ataques = obtener_cantidad_ataques_unidad(unidad)
+    
 
     for ataque in range(cantidad_ataques):
         if isinstance(objetivo, BaseCentral):
@@ -2812,6 +4185,9 @@ def preparar_siguiente_ronda():
     global defensa_seleccionada
     global unidad_seleccionada
     global modo_venta
+    global combate_en_progreso
+    global turno_combate_actual
+    global efectos_combate_pendientes
 
     if partida_terminada:
         etiqueta_mensaje.config(text="La partida ya terminó. No se pueden iniciar más rondas.")
@@ -2827,11 +4203,15 @@ def preparar_siguiente_ronda():
 
     dinero_defensor = DINERO_INICIAL_DEFENSOR + ((numero_ronda - 1) * BONO_DINERO_POR_RONDA)
     dinero_atacante = DINERO_INICIAL_ATACANTE + ((numero_ronda - 1) * BONO_DINERO_POR_RONDA)
+    efectos_combate_pendientes = []
+    limpiar_efectos_combate()
 
     fase_actual = "defensor"
     defensa_seleccionada = None
     unidad_seleccionada = None
     modo_venta = False
+    combate_en_progreso = False
+    turno_combate_actual = 1
 
     if boton_siguiente_ronda is not None:
         boton_siguiente_ronda.config(state="disabled")
@@ -2842,45 +4222,109 @@ def preparar_siguiente_ronda():
 
     actualizar_mapa_visual()
 
-# Función para ejecutar el combate completo de la ronda
+# Función para iniciar el combate animado
 # Entradas: ninguna
-# Salidas: ninguna, ejecuta combate y determina ganador
+# Salidas: ninguna, valida condiciones e inicia el combate por turnos visibles
 def ejecutar_combate():
     global fase_actual
+    global combate_en_progreso
+    global turno_combate_actual
 
     if partida_terminada:
         etiqueta_mensaje.config(text="La partida ya terminó.")
         return
 
     if fase_actual != "atacante":
-        etiqueta_mensaje.config(text="Primero debe terminar la fase del defensor.")
+        etiqueta_mensaje.config(text="Solo puedes ejecutar combate después de la fase atacante.")
         return
 
     if contar_unidades_colocadas() == 0:
-        etiqueta_mensaje.config(text="El atacante debe colocar al menos una unidad antes de combatir.")
+        etiqueta_mensaje.config(text="Debes colocar al menos una unidad atacante antes de combatir.")
         return
 
     fase_actual = "combate"
-    ganador = None
+    combate_en_progreso = True
+    turno_combate_actual = 1
 
-    for turno in range(1, LIMITE_TURNOS_COMBATE + 1):
-        ejecutar_ataque_torres()
-        ganador = verificar_ganador_ronda()
+    registrar_evento_combate("El combate ha iniciado.")
+    actualizar_mapa_visual()
 
-        if ganador is not None:
-            break
+    if ventana_juego_actual is not None:
+        ventana_juego_actual.after(VELOCIDAD_ANIMACION_COMBATE, ejecutar_turno_torres_animado)
 
-        ejecutar_turno_unidades()
-        ganador = verificar_ganador_ronda()
+# Función para ejecutar visualmente la fase de ataque de torres
+# Entradas: ninguna
+# Salidas: ninguna, ejecuta ataques de torres y programa la fase de unidades
+def ejecutar_turno_torres_animado():
+    global combate_en_progreso
 
-        if ganador is not None:
-            break
+    if not combate_en_progreso:
+        return
 
-    if ganador is None:
-        ganador = "defensor"
+    if partida_terminada:
+        combate_en_progreso = False
+        return
 
+    registrar_evento_combate(f"Turno {turno_combate_actual}: las torres atacan.")
+
+    ejecutar_ataque_torres()
+    actualizar_mapa_visual()
+    dibujar_efectos_combate_pendientes()
+
+    ganador = verificar_ganador_ronda()
+
+    if ganador is not None:
+        finalizar_combate_animado(ganador)
+        return
+
+    if ventana_juego_actual is not None:
+        ventana_juego_actual.after(VELOCIDAD_ANIMACION_COMBATE, ejecutar_turno_unidades_animado)
+
+# Función para ejecutar visualmente la fase de movimiento y ataque de unidades
+# Entradas: ninguna
+# Salidas: ninguna, mueve unidades, actualiza mapa y programa el siguiente turno
+def ejecutar_turno_unidades_animado():
+    global turno_combate_actual
+    global combate_en_progreso
+
+    if not combate_en_progreso:
+        return
+
+    if partida_terminada:
+        combate_en_progreso = False
+        return
+
+    registrar_evento_combate(f"Turno {turno_combate_actual}: las unidades avanzan y atacan.")
+
+    ejecutar_turno_unidades()
+    actualizar_mapa_visual()
+
+    ganador = verificar_ganador_ronda()
+
+    if ganador is not None:
+        finalizar_combate_animado(ganador)
+        return
+
+    turno_combate_actual += 1
+
+    if turno_combate_actual > LIMITE_TURNOS_COMBATE:
+        registrar_evento_combate("El defensor resistió todos los turnos del combate.")
+        finalizar_combate_animado("defensor")
+        return
+
+    if ventana_juego_actual is not None:
+        ventana_juego_actual.after(VELOCIDAD_ANIMACION_COMBATE, ejecutar_turno_torres_animado)
+
+# Función para finalizar el combate animado y registrar el ganador de ronda
+# Entradas: ganador de la ronda
+# Salidas: ninguna, detiene la animación y registra el resultado
+def finalizar_combate_animado(ganador):
+    global combate_en_progreso
+
+    combate_en_progreso = False
+
+    actualizar_mapa_visual()
     registrar_ganador_ronda(ganador)
-
 
 # Función para manejar el clic sobre una casilla del mapa
 # Entradas: fila y columna de la casilla presionada
@@ -2899,6 +4343,15 @@ def manejar_click_casilla(fila, columna):
     else:
         etiqueta_mensaje.config(text="La fase actual no permite colocar objetos.")
 
+# Función para manejar clics sobre el mapa dibujado en Canvas
+# Entradas: evento del mouse generado por Tkinter
+# Salidas: ninguna, convierte el clic en fila y columna del mapa
+def manejar_click_canvas(evento):
+    fila = evento.y // TAMANIO_CASILLA
+    columna = evento.x // TAMANIO_CASILLA
+
+    if posicion_en_rango(fila, columna):
+        manejar_click_casilla(fila, columna)
 
 # Función para terminar la fase del defensor
 # Entradas: ninguna
@@ -2933,32 +4386,28 @@ def terminar_fase_defensor():
     actualizar_estado_visual()
 
 
-# Función para crear los botones de la cuadrícula del mapa
-# Entradas: frame donde se colocará el mapa
-# Salidas: ninguna, crea los botones en pantalla
+# Función para crear el mapa visual usando Canvas
+# Entradas: frame donde se mostrará el mapa
+# Salidas: ninguna, crea el canvas interactivo del mapa
 def crear_botones_mapa(frame_mapa):
+    global canvas_mapa
     global botones_mapa
+
+    ancho_canvas = TAMANIO_MAPA * TAMANIO_CASILLA
+    alto_canvas = TAMANIO_MAPA * TAMANIO_CASILLA
 
     botones_mapa = []
 
-    for fila in range(TAMANIO_MAPA):
-        fila_botones = []
+    canvas_mapa = tk.Canvas(
+        frame_mapa,
+        width=ancho_canvas,
+        height=alto_canvas,
+        bg=COLOR_FONDO_APP,
+        highlightthickness=0
+    )
+    canvas_mapa.grid(row=0, column=0, padx=8, pady=8)
 
-        for columna in range(TAMANIO_MAPA):
-            boton = tk.Button(
-                frame_mapa,
-                text="",
-                width=8,
-                height=3,
-                bg="white",
-                relief="solid",
-                command=lambda f=fila, c=columna: manejar_click_casilla(f, c)
-            )
-
-            boton.grid(row=fila, column=columna, padx=1, pady=1)
-            fila_botones.append(boton)
-
-        botones_mapa.append(fila_botones)
+    canvas_mapa.bind("<Button-1>", manejar_click_canvas)
 
     actualizar_mapa_visual()
 
@@ -3257,6 +4706,8 @@ def abrir_ventana_mapa():
     global botones_defensor
     global botones_atacante
     global ventana_juego_actual
+    global boton_vender_defensor
+    global boton_vender_atacante
 
     botones_defensor = []
     botones_atacante = []
@@ -3465,7 +4916,7 @@ def abrir_ventana_mapa():
         wraplength=700,
         justify="center"
     )
-    etiqueta_mensaje.pack(pady=10)
+    #etiqueta_mensaje.pack(pady=10)
 
     # Panel atacante
     panel_atacante = tk.Frame(
@@ -3560,3 +5011,4 @@ def abrir_ventana_mapa():
 
 crear_archivo_usuarios()
 abrir_ventana_inicio()
+
