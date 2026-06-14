@@ -191,170 +191,431 @@ def validar_login(nombre_usuario, contrasena):
 
     return True, jugador, "Inicio de sesión correcto."
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Función para actualizar una victoria de un jugador según el rol utilizado.
+# Entradas: nombre_usuario y rol.
+# Salidas: True si se actualizó correctamente, False si el usuario no existe.
+def actualizar_victoria(nombre_usuario, rol):
+    usuarios = cargar_usuarios()
+
+    if nombre_usuario not in usuarios:
+        return False
+
+    jugador = usuarios[nombre_usuario]
+    jugador.sumar_victoria(rol)
+
+    usuarios[nombre_usuario] = jugador
+    guardar_usuarios(usuarios)
+
+    return True
+
+
+# Función para obtener el top 5 de jugadores según el rol indicado.
+# Entradas: rol, puede ser "defensor" o "atacante".
+# Salidas: lista con los mejores 5 jugadores.
+def obtener_top_jugadores(rol):
+    usuarios = cargar_usuarios()
+    lista_jugadores = list(usuarios.values())
+
+    if rol == "defensor":
+        lista_jugadores.sort(
+            key=lambda jugador: jugador.victorias_defensor,
+            reverse=True
+        )
+
+    elif rol == "atacante":
+        lista_jugadores.sort(
+            key=lambda jugador: jugador.victorias_atacante,
+            reverse=True
+        )
+
+    return lista_jugadores[:5]
+
+
+# Función para abrir la ventana principal del sistema de usuarios.
+# Desde esta ventana se puede registrar, iniciar sesión o ver el ranking.
+def abrir_ventana_inicio():
+    crear_archivo_usuarios()
+
+    ventana_inicio = tk.Tk()
+    ventana_inicio.title("Defensa y Asalto de Base - Inicio")
+    ventana_inicio.geometry("480x380")
+    ventana_inicio.resizable(False, False)
+
+    titulo = tk.Label(
+        ventana_inicio,
+        text="Defensa y Asalto de Base",
+        font=("Arial", 18, "bold")
+    )
+    titulo.pack(pady=25)
+
+    subtitulo = tk.Label(
+        ventana_inicio,
+        text="Sistema de usuarios",
+        font=("Arial", 12)
+    )
+    subtitulo.pack(pady=5)
+
+    boton_registro = tk.Button(
+        ventana_inicio,
+        text="Registrar usuario",
+        width=25,
+        height=2,
+        command=lambda: abrir_ventana_registro(ventana_inicio)
+    )
+    boton_registro.pack(pady=8)
+
+    boton_login = tk.Button(
+        ventana_inicio,
+        text="Iniciar partida",
+        width=25,
+        height=2,
+        command=lambda: abrir_ventana_login(ventana_inicio)
+    )
+    boton_login.pack(pady=8)
+
+    boton_ranking = tk.Button(
+        ventana_inicio,
+        text="Ver ranking",
+        width=25,
+        height=2,
+        command=lambda: abrir_ventana_ranking(ventana_inicio)
+    )
+    boton_ranking.pack(pady=8)
+
+    boton_salir = tk.Button(
+        ventana_inicio,
+        text="Salir",
+        width=25,
+        height=2,
+        command=ventana_inicio.destroy
+    )
+    boton_salir.pack(pady=8)
+
+    ventana_inicio.mainloop()
+
+
+# Función para abrir la ventana de registro de usuarios.
+# Entradas: ventana padre.
+# Salidas: ninguna.
+def abrir_ventana_registro(ventana_padre):
+    ventana_registro = tk.Toplevel(ventana_padre)
+    ventana_registro.title("Registro de usuario")
+    ventana_registro.geometry("420x350")
+    ventana_registro.resizable(False, False)
+
+    titulo = tk.Label(
+        ventana_registro,
+        text="Registrar nuevo usuario",
+        font=("Arial", 15, "bold")
+    )
+    titulo.pack(pady=15)
+
+    etiqueta_usuario = tk.Label(
+        ventana_registro,
+        text="Nombre de usuario:"
+    )
+    etiqueta_usuario.pack()
+
+    entrada_usuario = tk.Entry(
+        ventana_registro,
+        width=30
+    )
+    entrada_usuario.pack(pady=5)
+
+    etiqueta_contrasena = tk.Label(
+        ventana_registro,
+        text="Contraseña:"
+    )
+    etiqueta_contrasena.pack()
+
+    entrada_contrasena = tk.Entry(
+        ventana_registro,
+        width=30,
+        show="*"
+    )
+    entrada_contrasena.pack(pady=5)
+
+    etiqueta_confirmar = tk.Label(
+        ventana_registro,
+        text="Confirmar contraseña:"
+    )
+    etiqueta_confirmar.pack()
+
+    entrada_confirmar = tk.Entry(
+        ventana_registro,
+        width=30,
+        show="*"
+    )
+    entrada_confirmar.pack(pady=5)
+
+    etiqueta_mensaje = tk.Label(
+        ventana_registro,
+        text="",
+        fg="red"
+    )
+    etiqueta_mensaje.pack(pady=10)
+
+    # Función interna para registrar al usuario.
+    def accion_registrar():
+        nombre_usuario = entrada_usuario.get()
+        contrasena = entrada_contrasena.get()
+        confirmar = entrada_confirmar.get()
+
+        if contrasena != confirmar:
+            etiqueta_mensaje.config(
+                text="Las contraseñas no coinciden.",
+                fg="red"
+            )
+            return
+
+        registrado, mensaje = registrar_usuario(nombre_usuario, contrasena)
+
+        if registrado:
+            etiqueta_mensaje.config(
+                text=mensaje,
+                fg="green"
+            )
+
+            entrada_usuario.delete(0, tk.END)
+            entrada_contrasena.delete(0, tk.END)
+            entrada_confirmar.delete(0, tk.END)
+
+        else:
+            etiqueta_mensaje.config(
+                text=mensaje,
+                fg="red"
+            )
+
+    boton_registrar = tk.Button(
+        ventana_registro,
+        text="Registrar",
+        width=20,
+        command=accion_registrar
+    )
+    boton_registrar.pack(pady=10)
+
+
+# Función para abrir la ventana de inicio de sesión.
+# Permite iniciar sesión con dos jugadores diferentes.
+def abrir_ventana_login(ventana_inicio):
+    ventana_login = tk.Toplevel(ventana_inicio)
+    ventana_login.title("Inicio de sesión")
+    ventana_login.geometry("520x430")
+    ventana_login.resizable(False, False)
+
+    titulo = tk.Label(
+        ventana_login,
+        text="Inicio de sesión de jugadores",
+        font=("Arial", 15, "bold")
+    )
+    titulo.pack(pady=15)
+
+    descripcion = tk.Label(
+        ventana_login,
+        text="Ambos jugadores deben iniciar sesión antes de comenzar."
+    )
+    descripcion.pack(pady=5)
+
+    frame = tk.Frame(ventana_login)
+    frame.pack(pady=15)
+
+    # Jugador 1
+    etiqueta_jugador_1 = tk.Label(
+        frame,
+        text="Jugador 1",
+        font=("Arial", 11, "bold")
+    )
+    etiqueta_jugador_1.grid(row=0, column=0, columnspan=2, pady=8)
+
+    tk.Label(frame, text="Usuario:").grid(row=1, column=0, padx=5, pady=5, sticky="e")
+
+    entrada_usuario_1 = tk.Entry(
+        frame,
+        width=25
+    )
+    entrada_usuario_1.grid(row=1, column=1, padx=5, pady=5)
+
+    tk.Label(frame, text="Contraseña:").grid(row=2, column=0, padx=5, pady=5, sticky="e")
+
+    entrada_contrasena_1 = tk.Entry(
+        frame,
+        width=25,
+        show="*"
+    )
+    entrada_contrasena_1.grid(row=2, column=1, padx=5, pady=5)
+
+    # Jugador 2
+    etiqueta_jugador_2 = tk.Label(
+        frame,
+        text="Jugador 2",
+        font=("Arial", 11, "bold")
+    )
+    etiqueta_jugador_2.grid(row=3, column=0, columnspan=2, pady=15)
+
+    tk.Label(frame, text="Usuario:").grid(row=4, column=0, padx=5, pady=5, sticky="e")
+
+    entrada_usuario_2 = tk.Entry(
+        frame,
+        width=25
+    )
+    entrada_usuario_2.grid(row=4, column=1, padx=5, pady=5)
+
+    tk.Label(frame, text="Contraseña:").grid(row=5, column=0, padx=5, pady=5, sticky="e")
+
+    entrada_contrasena_2 = tk.Entry(
+        frame,
+        width=25,
+        show="*"
+    )
+    entrada_contrasena_2.grid(row=5, column=1, padx=5, pady=5)
+
+    etiqueta_mensaje = tk.Label(
+        ventana_login,
+        text="",
+        fg="red"
+    )
+    etiqueta_mensaje.pack(pady=10)
+
+    # Función interna para validar los dos inicios de sesión.
+    def accion_iniciar_partida():
+        usuario_1 = entrada_usuario_1.get().strip()
+        contrasena_1 = entrada_contrasena_1.get().strip()
+
+        usuario_2 = entrada_usuario_2.get().strip()
+        contrasena_2 = entrada_contrasena_2.get().strip()
+
+        if usuario_1 == usuario_2:
+            etiqueta_mensaje.config(
+                text="Los jugadores deben ser usuarios diferentes.",
+                fg="red"
+            )
+            return
+
+        login_1, jugador_1, mensaje_1 = validar_login(usuario_1, contrasena_1)
+
+        if not login_1:
+            etiqueta_mensaje.config(
+                text="Jugador 1: " + mensaje_1,
+                fg="red"
+            )
+            return
+
+        login_2, jugador_2, mensaje_2 = validar_login(usuario_2, contrasena_2)
+
+        if not login_2:
+            etiqueta_mensaje.config(
+                text="Jugador 2: " + mensaje_2,
+                fg="red"
+            )
+            return
+
+        ventana_login.destroy()
+        ventana_inicio.destroy()
+
+        abrir_ventana_seleccion_facciones(
+            jugador_1.nombre_usuario,
+            jugador_2.nombre_usuario
+        )
+
+    boton_iniciar = tk.Button(
+        ventana_login,
+        text="Continuar",
+        width=20,
+        height=2,
+        command=accion_iniciar_partida
+    )
+    boton_iniciar.pack(pady=10)
+
+
+# Función para abrir la ventana de ranking.
+# Muestra top 5 de defensores y top 5 de atacantes.
+def abrir_ventana_ranking(ventana_padre):
+    ventana_ranking = tk.Toplevel(ventana_padre)
+    ventana_ranking.title("Ranking de jugadores")
+    ventana_ranking.geometry("620x430")
+    ventana_ranking.resizable(False, False)
+
+    titulo = tk.Label(
+        ventana_ranking,
+        text="Ranking de jugadores",
+        font=("Arial", 16, "bold")
+    )
+    titulo.pack(pady=15)
+
+    frame_rankings = tk.Frame(ventana_ranking)
+    frame_rankings.pack(pady=10)
+
+    # Ranking defensores
+    frame_defensores = tk.LabelFrame(
+        frame_rankings,
+        text="Top 5 defensores",
+        padx=15,
+        pady=10
+    )
+    frame_defensores.grid(row=0, column=0, padx=15, sticky="n")
+
+    top_defensores = obtener_top_jugadores("defensor")
+
+    if len(top_defensores) == 0:
+        tk.Label(
+            frame_defensores,
+            text="No hay jugadores registrados."
+        ).pack()
+
+    else:
+        posicion = 1
+
+        for jugador in top_defensores:
+            texto = f"{posicion}. {jugador.nombre_usuario} - {jugador.victorias_defensor} victorias"
+
+            tk.Label(
+                frame_defensores,
+                text=texto,
+                anchor="w",
+                width=30
+            ).pack(pady=3)
+
+            posicion += 1
+
+    # Ranking atacantes
+    frame_atacantes = tk.LabelFrame(
+        frame_rankings,
+        text="Top 5 atacantes",
+        padx=15,
+        pady=10
+    )
+    frame_atacantes.grid(row=0, column=1, padx=15, sticky="n")
+
+    top_atacantes = obtener_top_jugadores("atacante")
+
+    if len(top_atacantes) == 0:
+        tk.Label(
+            frame_atacantes,
+            text="No hay jugadores registrados."
+        ).pack()
+
+    else:
+        posicion = 1
+
+        for jugador in top_atacantes:
+            texto = f"{posicion}. {jugador.nombre_usuario} - {jugador.victorias_atacante} victorias"
+
+            tk.Label(
+                frame_atacantes,
+                text=texto,
+                anchor="w",
+                width=30
+            ).pack(pady=3)
+
+            posicion += 1
+
+    boton_cerrar = tk.Button(
+        ventana_ranking,
+        text="Cerrar",
+        width=15,
+        command=ventana_ranking.destroy
+    )
+    boton_cerrar.pack(pady=20)
 
 
 
@@ -1754,7 +2015,10 @@ def jugar_otra_partida(ventana_resultado):
     botones_mapa = []
 
     reiniciar_estado_partida()
-    abrir_ventana_seleccion_facciones()
+abrir_ventana_seleccion_facciones(
+    NOMBRE_JUGADOR_DEFENSOR,
+    NOMBRE_JUGADOR_ATACANTE
+)
 
 
 # Función para mostrar una ventana bonita con el resultado final de la partida
@@ -2505,15 +2769,21 @@ def registrar_ganador_ronda(ganador):
         mensaje = "No se pudo determinar el ganador de la ronda."
 
     if rondas_ganadas_defensor >= RONDAS_PARA_GANAR:
-        partida_terminada = True
-        mensaje += " El defensor ganó la partida completa."
+    partida_terminada = True
 
-    elif rondas_ganadas_atacante >= RONDAS_PARA_GANAR:
-        partida_terminada = True
-        mensaje += " El atacante ganó la partida completa."
+    actualizar_victoria(NOMBRE_JUGADOR_DEFENSOR, "defensor")
 
-    else:
-        mensaje += " Presiona 'Siguiente ronda' para continuar."
+    mensaje += " El defensor ganó la partida completa."
+
+elif rondas_ganadas_atacante >= RONDAS_PARA_GANAR:
+    partida_terminada = True
+
+    actualizar_victoria(NOMBRE_JUGADOR_ATACANTE, "atacante")
+
+    mensaje += " El atacante ganó la partida completa."
+
+else:
+    mensaje += " Presiona 'Siguiente ronda' para continuar."
 
     etiqueta_mensaje.config(text=mensaje)
 
@@ -3288,4 +3558,5 @@ def abrir_ventana_mapa():
     ventana_juego_actual.mainloop()
 
 
-abrir_ventana_seleccion_facciones("Fabian", "Compañero")
+crear_archivo_usuarios()
+abrir_ventana_inicio()
