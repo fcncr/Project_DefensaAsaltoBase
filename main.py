@@ -320,65 +320,172 @@ def abrir_ventana_inicio():
 
 # Función para abrir la ventana de registro de usuarios.
 # Entradas: ventana padre.
-# Salidas: ninguna.
+# Salidas: ninguna, permite registrar nuevos jugadores.
 def abrir_ventana_registro(ventana_padre):
     ventana_registro = tk.Toplevel(ventana_padre)
     ventana_registro.title("Registro de usuario")
-    ventana_registro.geometry("420x350")
+    ventana_registro.geometry("500x430")
     ventana_registro.resizable(False, False)
+    ventana_registro.config(bg=COLOR_FONDO_APP)
+    ventana_registro.grab_set()
 
     titulo = tk.Label(
         ventana_registro,
-        text="Registrar nuevo usuario",
-        font=("Arial", 15, "bold")
+        text="Registrar jugador",
+        font=("Arial", 20, "bold"),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TITULO
     )
-    titulo.pack(pady=15)
+    titulo.pack(pady=(25, 8))
+
+    subtitulo = tk.Label(
+        ventana_registro,
+        text="Crea una cuenta para guardar tus victorias.",
+        font=("Arial", 11),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TEXTO
+    )
+    subtitulo.pack(pady=(0, 15))
+
+    panel = tk.Frame(
+        ventana_registro,
+        bg=COLOR_PANEL,
+        bd=1,
+        relief="solid"
+    )
+    panel.pack(padx=55, pady=15, fill="both", expand=True)
 
     etiqueta_usuario = tk.Label(
-        ventana_registro,
-        text="Nombre de usuario:"
+        panel,
+        text="Nombre de usuario:",
+        font=("Arial", 11, "bold"),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO
     )
-    etiqueta_usuario.pack()
+    etiqueta_usuario.pack(pady=(25, 5))
 
     entrada_usuario = tk.Entry(
-        ventana_registro,
-        width=30
+        panel,
+        width=30,
+        font=("Arial", 11),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TEXTO,
+        relief="flat",
+        bd=4
     )
     entrada_usuario.pack(pady=5)
 
     etiqueta_contrasena = tk.Label(
-        ventana_registro,
-        text="Contraseña:"
+        panel,
+        text="Contraseña:",
+        font=("Arial", 11, "bold"),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO
     )
-    etiqueta_contrasena.pack()
+    etiqueta_contrasena.pack(pady=(12, 5))
 
     entrada_contrasena = tk.Entry(
-        ventana_registro,
+        panel,
         width=30,
+        font=("Arial", 11),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TEXTO,
+        relief="flat",
+        bd=4,
         show="*"
     )
     entrada_contrasena.pack(pady=5)
 
     etiqueta_confirmar = tk.Label(
-        ventana_registro,
-        text="Confirmar contraseña:"
+        panel,
+        text="Confirmar contraseña:",
+        font=("Arial", 11, "bold"),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO
     )
-    etiqueta_confirmar.pack()
+    etiqueta_confirmar.pack(pady=(12, 5))
 
     entrada_confirmar = tk.Entry(
-        ventana_registro,
+        panel,
         width=30,
+        font=("Arial", 11),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TEXTO,
+        relief="flat",
+        bd=4,
         show="*"
     )
     entrada_confirmar.pack(pady=5)
 
     etiqueta_mensaje = tk.Label(
-        ventana_registro,
+        panel,
         text="",
-        fg="red"
+        font=("Arial", 10, "bold"),
+        bg=COLOR_PANEL,
+        fg="red",
+        wraplength=350,
+        justify="center"
     )
-    etiqueta_mensaje.pack(pady=10)
+    etiqueta_mensaje.pack(pady=12)
 
+    # Función interna para registrar al usuario.
+    # Valida que las contraseñas coincidan y luego usa registrar_usuario().
+    def accion_registrar():
+        nombre_usuario = entrada_usuario.get()
+        contrasena = entrada_contrasena.get()
+        confirmar = entrada_confirmar.get()
+
+        if contrasena != confirmar:
+            etiqueta_mensaje.config(
+                text="Las contraseñas no coinciden.",
+                fg="red"
+            )
+            return
+
+        registrado, mensaje = registrar_usuario(nombre_usuario, contrasena)
+
+        if registrado:
+            etiqueta_mensaje.config(
+                text=mensaje,
+                fg="green"
+            )
+
+            entrada_usuario.delete(0, tk.END)
+            entrada_contrasena.delete(0, tk.END)
+            entrada_confirmar.delete(0, tk.END)
+            entrada_usuario.focus()
+
+        else:
+            etiqueta_mensaje.config(
+                text=mensaje,
+                fg="red"
+            )
+
+    frame_botones = tk.Frame(
+        panel,
+        bg=COLOR_PANEL
+    )
+    frame_botones.pack(pady=(5, 20))
+
+    boton_registrar = crear_boton_estilizado(
+        frame_botones,
+        "Registrar",
+        accion_registrar,
+        ancho=15,
+        color_fondo=COLOR_BOTON
+    )
+    boton_registrar.grid(row=0, column=0, padx=6)
+
+    boton_cerrar = crear_boton_estilizado(
+        frame_botones,
+        "Volver",
+        ventana_registro.destroy,
+        ancho=15,
+        color_fondo=COLOR_BOTON_SECUNDARIO
+    )
+    boton_cerrar.grid(row=0, column=1, padx=6)
+
+    entrada_usuario.focus()
     # Función interna para registrar al usuario.
     def accion_registrar():
         nombre_usuario = entrada_usuario.get()
