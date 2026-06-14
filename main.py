@@ -2015,7 +2015,7 @@ def jugar_otra_partida(ventana_resultado):
     botones_mapa = []
 
     reiniciar_estado_partida()
-abrir_ventana_seleccion_facciones(
+    abrir_ventana_seleccion_facciones(
     NOMBRE_JUGADOR_DEFENSOR,
     NOMBRE_JUGADOR_ATACANTE
 )
@@ -2769,23 +2769,23 @@ def registrar_ganador_ronda(ganador):
         mensaje = "No se pudo determinar el ganador de la ronda."
 
     if rondas_ganadas_defensor >= RONDAS_PARA_GANAR:
-    partida_terminada = True
+        partida_terminada = True
 
-    actualizar_victoria(NOMBRE_JUGADOR_DEFENSOR, "defensor")
+        actualizar_victoria(NOMBRE_JUGADOR_DEFENSOR, "defensor")
 
-    mensaje += " El defensor ganó la partida completa."
+        mensaje += " El defensor ganó la partida completa."
 
-elif rondas_ganadas_atacante >= RONDAS_PARA_GANAR:
-    partida_terminada = True
+    elif rondas_ganadas_atacante >= RONDAS_PARA_GANAR:
+        partida_terminada = True
 
-    actualizar_victoria(NOMBRE_JUGADOR_ATACANTE, "atacante")
+        actualizar_victoria(NOMBRE_JUGADOR_ATACANTE, "atacante")
 
-    mensaje += " El atacante ganó la partida completa."
+        mensaje += " El atacante ganó la partida completa."
 
-else:
-    mensaje += " Presiona 'Siguiente ronda' para continuar."
+    else:
+        mensaje += " Presiona 'Siguiente ronda' para continuar."
 
-    etiqueta_mensaje.config(text=mensaje)
+        etiqueta_mensaje.config(text=mensaje)
 
     if boton_siguiente_ronda is not None:
         if partida_terminada:
