@@ -1,0 +1,240 @@
+Manual de usuario
+Defensa y Asalto de Base
+
+-------------------------------------------------------------------------------------------------------
+
+1. Introducción
+
+Defensa y Asalto de Base es un juego de estrategia para dos jugadores. Un jugador toma el rol de defensor, encargado de proteger la base central, mientras que el otro toma el rol de atacante, encargado de destruir la base utilizando unidades ofensivas.
+El juego se desarrolla por rondas. El primer jugador que consiga ganar 3 rondas será el ganador de la partida.
+
+-------------------------------------------------------------------------------------------------------
+
+2. Inicio del programa
+
+Para iniciar el juego, el usuario debe ejecutar el archivo principal:
+main.py
+Al abrir el programa, se mostrará la ventana inicial del sistema.
+
+-------------------------------------------------------------------------------------------------------
+
+3. Registro e inicio de sesión
+
+Al iniciar el programa, los jugadores deben ingresar al sistema.
+
+Registro
+Si un jugador no tiene cuenta, debe registrarse ingresando sus datos en la opción correspondiente. El sistema guardará la información del usuario para futuras partidas.
+
+Inicio de sesión
+Si el jugador ya tiene una cuenta creada, debe iniciar sesión con su usuario y contraseña.
+Ambos jugadores deben estar registrados o haber iniciado sesión para continuar con la partida.
+
+-------------------------------------------------------------------------------------------------------
+
+4. Selección de roles y facciones
+
+Después de ingresar al sistema, se muestra la pantalla de preparación de partida.
+
+En esta pantalla los jugadores deben seleccionar:
+
+Qué jugador será el defensor.
+Qué jugador será el atacante.
+La facción del defensor.
+La facción del atacante.
+
+Las facciones disponibles son:
+
+Medieval.
+Futurista.
+Oscura.
+
+El defensor y el atacante no pueden seleccionar la misma facción.
+Una vez seleccionados los roles y las facciones, se debe presionar el botón Iniciar partida.
+
+-------------------------------------------------------------------------------------------------------
+
+5. Pantalla principal del juego
+La pantalla principal está dividida en tres secciones:
+
+Panel del defensor
+Se encuentra al lado izquierdo de la pantalla. Desde este panel el defensor puede colocar:
+
+Muros.
+Torre Básica.
+Torre Pesada.
+Torre Mágica.
+
+También puede vender o quitar defensas antes del combate.
+
+Mapa central
+En el centro se encuentra el mapa del juego. El mapa está compuesto por una cuadrícula de 10x10 casillas. En este mapa se colocan las torres, muros, unidades y la base central.
+Panel del atacante
+Se encuentra al lado derecho de la pantalla. Desde este panel el atacante puede colocar:
+
+Soldado.
+Tanque.
+Unidad Rápida.
+
+También puede vender o quitar unidades antes del combate.
+
+-------------------------------------------------------------------------------------------------------
+
+6. Fase del defensor
+
+La partida inicia con la fase del defensor.
+
+Durante esta fase, el defensor debe seleccionar una defensa desde su panel y luego hacer clic en una casilla vacía del mapa para colocarla.
+
+El defensor puede colocar:
+
+Muro: sirve para bloquear o retrasar el avance enemigo.
+Torre Básica: torre equilibrada de bajo costo.
+Torre Pesada: torre resistente y con mayor daño.
+Torre Mágica: torre con habilidad para congelar unidades.
+
+El defensor debe colocar al menos una defensa antes de pasar a la siguiente fase.
+
+Cuando termine de colocar sus defensas, debe presionar el botón Terminar fase.
+
+-------------------------------------------------------------------------------------------------------
+
+7. Fase del atacante
+
+Después de que el defensor termina su fase, inicia la fase del atacante.
+
+Durante esta fase, el atacante debe seleccionar una unidad desde su panel y luego hacer clic en una casilla vacía del mapa para colocarla.
+
+El atacante puede colocar:
+
+Soldado: unidad equilibrada y económica.
+Tanque: unidad resistente con escudo temporal.
+Unidad Rápida: unidad veloz que puede avanzar más casillas por turno.
+
+El atacante debe colocar al menos una unidad antes de iniciar el combate.
+
+Cuando esté listo, debe presionar el botón Ejecutar combate.
+
+-------------------------------------------------------------------------------------------------------
+
+8. Compra y dinero
+
+Cada jugador tiene una cantidad de dinero disponible.
+
+El defensor usa su dinero para comprar muros y torres.
+El atacante usa su dinero para comprar unidades.
+
+Si un jugador no tiene suficiente dinero para comprar un objeto, el sistema no permitirá colocarlo.
+
+El dinero disponible se muestra en el panel correspondiente de cada jugador.
+
+-------------------------------------------------------------------------------------------------------
+
+9. Vender o quitar objetos
+
+Antes del combate, los jugadores pueden vender o quitar objetos colocados en el mapa.
+
+Para vender:
+
+Presionar el botón Vender / Quitar.
+Hacer clic sobre el objeto que se desea vender.
+El objeto será eliminado del mapa y el jugador recuperará su costo.
+
+El modo de venta queda activo, por lo que se pueden vender varios objetos seguidos. Para salir del modo venta se debe presionar Cancelar selección o seleccionar otra acción.
+
+Reglas de venta:
+
+El defensor solo puede vender torres y muros.
+El atacante solo puede vender unidades.
+No se puede vender la base central.
+No se puede vender durante el combate.
+
+-------------------------------------------------------------------------------------------------------
+
+10. Combate
+Cuando el atacante presiona Ejecutar combate, inicia la fase de combate.
+
+Durante el combate:
+
+Las torres atacan automáticamente a las unidades dentro de su alcance.
+Las unidades avanzan hacia la base central.
+Si una unidad encuentra un muro o torre, lo ataca.
+Si una unidad llega a la base, la ataca.
+El mapa muestra efectos visuales de ataques, habilidades y barras de vida.
+
+Durante el combate no se pueden colocar, vender ni modificar objetos.
+
+-------------------------------------------------------------------------------------------------------
+
+11. Habilidades especiales
+
+Algunas torres y unidades tienen habilidades que se activan automáticamente durante el combate.
+
+Torres
+Torre Básica: puede realizar disparo doble.
+Torre Pesada: puede causar daño extra.
+Torre Mágica: puede congelar una unidad enemiga.
+Unidades
+Soldado: puede realizar ataque doble.
+Tanque: puede activar escudo temporal.
+Unidad Rápida: puede aumentar su velocidad temporalmente.
+
+-------------------------------------------------------------------------------------------------------
+
+12. Rondas y victoria
+
+Una ronda termina cuando ocurre una de estas condiciones:
+
+El atacante destruye la base central.
+El defensor elimina todas las unidades atacantes.
+El defensor resiste hasta el límite de turnos del combate.
+
+Después de cada ronda, el marcador se actualiza.
+
+Gana la partida el primer jugador que consiga 3 rondas ganadas.
+
+-------------------------------------------------------------------------------------------------------
+
+13. Botones principales
+Iniciar partida
+
+Inicia el juego después de seleccionar roles y facciones.
+
+Terminar fase
+
+Finaliza la fase del defensor y permite pasar a la fase del atacante.
+
+Ejecutar combate
+
+Inicia el combate automático.
+
+Siguiente ronda
+
+Prepara una nueva ronda después de que termina la anterior.
+
+Reiniciar ronda
+
+Reinicia la ronda actual sin borrar el marcador general.
+
+Vender / Quitar
+
+Activa el modo para vender objetos colocados antes del combate.
+
+Cancelar selección
+
+Cancela la defensa, unidad o modo venta seleccionado.
+
+Salir
+
+Cierra la ventana del juego.
+
+-------------------------------------------------------------------------------------------------------
+
+14. Recomendaciones de uso
+
+Colocar torres cerca de la base o en zonas donde puedan cubrir varias casillas.
+Usar muros para bloquear el avance de las unidades.
+Combinar diferentes tipos de torres para mejorar la defensa.
+Como atacante, combinar soldados, tanques y unidades rápidas.
+Revisar el dinero disponible antes de colocar objetos.
+Usar la opción de vender si se colocó un objeto en una posición incorrecta.
+Observar las barras de vida durante el combate para entender el estado de las unidades y defensas.
