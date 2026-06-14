@@ -1,231 +1,195 @@
 #INSTITUTO TECNOLÓGICO DE COSTA RICA
 #Proyecto defensa y asalto de base
 #Fabián Cambronero Núñez  Carné: 2026079420
-#Alejandro Campos
+#Alejandro Campos Lopez Carne: 2026090719
 
 #-------
 #IMPORTS
 #-------
 import tkinter as tk
+import json
+import os
+
+
+#-----------------------
+#Archivos de usuarios---
+#-----------------------
+
+RUTA_PROYECTO = os.path.dirname(os.path.abspath(__file__))
+CARPETA_DATOS =os.path.join(RUTA_PROYECTO,'datos')
+ARCHIVO_USUARIOS = os.path.join(CARPETA_DATOS,'usuarios.json')
+
+
+#Funcion para crear el archivo usuarios.json si no existe
+#E: nada
+#S: crea la carpeta datos y el archivo usuarios.json
+
+def crear_archivo_usuarios():
+    if not os.path.exists(CARPETA_DATOS):
+        os.makedirs(CARPETA_DATOS) #si no existe la carpeta datos la crea
+
+    if not os.path.exists(ARCHIVO_USUARIOS):
+        with open(ARCHIVO_USUARIOS,'w', encoding = 'utf-8') as archivo: # igual si no existe el json lo crea y lo deja con todo listo
+            json.dump({}, archivo, indent=4, ensure_ascii=False)
 
+# -------------------------
+# Clase Jugador - cada jugador va aqui 
+# -------------------------
+class Jugador:
+    '''
+    atributos --> nombre_usuario, contrasena, victorias_defensor, victorias_atacante
+    metodos --> convertir_a_diccionario, sumar_victoria
+    '''
+    def __init__(self, nombre_usuario, contrasena, victorias_defensor=0, victorias_atacante=0):
+        self.nombre_usuario = nombre_usuario
+        self.contrasena = contrasena
+        self.victorias_defensor = victorias_defensor
+        self.victorias_atacante = victorias_atacante
+
+    # metodo para convertir el objeto Jugador en un diccionario.
+    def convertir_a_diccionario(self): #todos los objetos se guardan en el json
+        return {
+            "contrasena": self.contrasena,
+            "victorias_defensor": self.victorias_defensor,
+            "victorias_atacante": self.victorias_atacante
+        }
 
+    # metodo para sumar una victoria según el rol utilizado.
+    def sumar_victoria(self, rol):
+        if rol == "defensor":
+            self.victorias_defensor += 1
 
+        elif rol == "atacante":
+            self.victorias_atacante += 1
 
+# -------------------------
+# Funciones para manejar usuarios
+# -------------------------
 
+# Función para cargar los usuarios guardados en el archivo usuarios.json.
+# Entradas: ninguna.
+# Salidas: un diccionario con los usuarios cargados como objetos Jugador.
+def cargar_usuarios():
 
+    # Se asegura que el archivo exista antes de intentar leerlo.
+    crear_archivo_usuarios()
 
+    # Se abre el archivo en modo lectura.
+    with open(ARCHIVO_USUARIOS, "r", encoding="utf-8") as archivo:
+        try:
+            datos = json.load(archivo)
 
+        # Si el archivo está vacío o tiene un error, se usa un diccionario vacío.
+        except json.JSONDecodeError:
+            datos = {}
 
+    # Diccionario donde se guardarán los usuarios como objetos Jugador.
+    usuarios = {}
 
+    # Se recorre cada usuario guardado en el archivo.
+    for nombre_usuario in datos:
 
+        # Se obtiene la información del usuario actual.
+        informacion = datos[nombre_usuario]
 
+        # Se crea un objeto Jugador con la información guardada.
+        jugador = Jugador(
+            nombre_usuario,
+            informacion.get("contrasena", ""),
+            informacion.get("victorias_defensor", 0),
+            informacion.get("victorias_atacante", 0)
+        )
 
+        # Se guarda el jugador en el diccionario de usuarios.
+        usuarios[nombre_usuario] = jugador
 
+    # Se retorna el diccionario con todos los usuarios cargados.
+    return usuarios
 
 
+# Función para guardar los usuarios en el archivo usuarios.json.
+# Entradas: diccionario de usuarios.
+# Salidas: ninguna, guarda la información en el archivo.
+def guardar_usuarios(usuarios):
 
+    # Diccionario donde se guardará la información lista para escribir en JSON.
+    datos = {}
 
+    # Se recorre cada usuario del diccionario.
+    for nombre_usuario in usuarios:
 
+        # Se obtiene el objeto Jugador.
+        jugador = usuarios[nombre_usuario]
 
+        # Se convierte el objeto Jugador en un diccionario.
+        datos[nombre_usuario] = jugador.convertir_a_diccionario()
 
+    # Se abre el archivo en modo escritura y se guarda la información actualizada.
+    with open(ARCHIVO_USUARIOS, "w", encoding="utf-8") as archivo:
+        json.dump(datos, archivo, indent=4, ensure_ascii=False)
 
 
+# Función para registrar un nuevo usuario.
+# Entradas: nombre_usuario, contrasena 
+# Salidas: True o False, además de un mensaje explicativo.
+def registrar_usuario(nombre_usuario, contrasena):
 
+    # Se eliminan espacios innecesarios al inicio o final.
+    nombre_usuario = nombre_usuario.strip()
+    contrasena = contrasena.strip()
 
+    # Se valida que el usuario no esté vacío.
+    if nombre_usuario == "":
+        return False, "Debe ingresar un nombre de usuario."
 
+    # Se valida que la contraseña no esté vacía.
+    if contrasena == "":
+        return False, "Debe ingresar una contraseña."
 
+    # Se cargan los usuarios existentes.
+    usuarios = cargar_usuarios()
 
+    # Se revisa si el usuario ya existe.
+    if nombre_usuario in usuarios:
+        return False, "Ese nombre de usuario ya existe."
 
+    # Se crea un nuevo jugador con cero victorias.
+    nuevo_jugador = Jugador(nombre_usuario, contrasena)
 
+    # Se agrega al diccionario de usuarios.
+    usuarios[nombre_usuario] = nuevo_jugador
 
+    # Se guarda la información actualizada en el archivo.
+    guardar_usuarios(usuarios)
 
+    return True, "Usuario registrado correctamente."
 
 
+# Función para validar el inicio de sesión de un usuario.
+# Entradas: nombre_usuario, contrasena 
+# Salidas: True o False, el objeto Jugador si existe, y un mensaje.
+def validar_login(nombre_usuario, contrasena):
 
+    nombre_usuario = nombre_usuario.strip()
+    contrasena = contrasena.strip()
 
+    if nombre_usuario == "":
+        return False, None, "Debe ingresar un nombre de usuario."
 
+    if contrasena == "":
+        return False, None, "Debe ingresar una contraseña."
 
+    usuarios = cargar_usuarios()
 
+    if nombre_usuario not in usuarios:
+        return False, None, "El usuario no existe."
 
+    jugador = usuarios[nombre_usuario]
 
+    if jugador.contrasena != contrasena:
+        return False, None, "La contraseña es incorrecta."
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return True, jugador, "Inicio de sesión correcto."
 
 
 
