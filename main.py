@@ -197,6 +197,771 @@ def validar_login(nombre_usuario, contrasena):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #----------------------------------------------------------
 # MAPA, ENTIDADES, FACCIONES Y COMBATE
 #-----------------------------------------------------------
@@ -215,6 +980,22 @@ LIMITE_TURNOS_COMBATE = 30
 
 BONO_DINERO_POR_RONDA = 50
 RONDAS_PARA_GANAR = 3
+
+COLOR_FONDO_APP = "#EDE7DD"
+COLOR_PANEL = "#F8F5F0"
+COLOR_BORDE = "#C7B8A3"
+COLOR_TEXTO = "#2F2A24"
+COLOR_TITULO = "#5A4A3A"
+COLOR_BOTON = "#8C6A43"
+COLOR_BOTON_TEXTO = "white"
+COLOR_BOTON_SECUNDARIO = "#A78A6A"
+COLOR_BOTON_ALERTA = "#7A3E2B"
+COLOR_ESTADO = "#DDD2C2"
+
+# Nombres temporales de jugadores
+NOMBRE_JUGADOR_DEFENSOR = "Jugador DefensorN"
+NOMBRE_JUGADOR_ATACANTE = "Jugador AtacanteN"
+
 # -------------------------
 # Clases base del juego
 # -------------------------
@@ -230,6 +1011,9 @@ class Faccion:
 
 #Clase Torre
 class Torre:
+    # Función para inicializar una torre defensiva
+    # Entradas: nombre, costo, vida, daño, alcance, habilidad y turnos de habilidad
+    # Salidas: objeto Torre inicializado
     def __init__(self, nombre, costo, vida, danio, alcance, habilidad, turnos_habilidad):
         self.nombre = nombre
         self.costo = costo
@@ -238,17 +1022,46 @@ class Torre:
         self.alcance = alcance
         self.habilidad = habilidad
         self.turnos_habilidad = turnos_habilidad
+        self.contador_turnos = 0
 
+    # Función para verificar si la torre sigue viva
+    # Entradas: ninguna
+    # Salidas: True si la vida es mayor a 0, False si no
     def esta_viva(self):
         return self.vida > 0
 
+    # Función para reducir la vida de la torre
+    # Entradas: cantidad de daño recibido
+    # Salidas: ninguna, actualiza la vida de la torre
     def recibir_danio(self, cantidad):
         self.vida -= cantidad
+
         if self.vida < 0:
             self.vida = 0
 
+    # Función para aumentar el contador de turnos de la torre
+    # Entradas: ninguna
+    # Salidas: ninguna, suma un turno al contador
+    def avanzar_turno_habilidad(self):
+        self.contador_turnos += 1
+
+    # Función para verificar si la habilidad de la torre está lista
+    # Entradas: ninguna
+    # Salidas: True si la habilidad puede activarse, False si no
+    def habilidad_lista(self):
+        return self.contador_turnos >= self.turnos_habilidad
+
+    # Función para reiniciar el contador de habilidad de la torre
+    # Entradas: ninguna
+    # Salidas: ninguna, reinicia el contador de turnos
+    def reiniciar_habilidad(self):
+        self.contador_turnos = 0
+
 #Clase Unidad
 class Unidad:
+    # Función para inicializar una unidad atacante
+    # Entradas: nombre, costo, vida, daño, velocidad, habilidad y turnos de habilidad
+    # Salidas: objeto Unidad inicializado
     def __init__(self, nombre, costo, vida, danio, velocidad, habilidad, turnos_habilidad):
         self.nombre = nombre
         self.costo = costo
@@ -257,14 +1070,69 @@ class Unidad:
         self.velocidad = velocidad
         self.habilidad = habilidad
         self.turnos_habilidad = turnos_habilidad
+        self.contador_turnos = 0
 
+        self.turnos_congelada = 0
+        self.escudo_activo = False
+        self.turnos_escudo = 0
+        self.velocidad_extra_temporal = 0
+
+    # Función para verificar si la unidad sigue viva
+    # Entradas: ninguna
+    # Salidas: True si la vida es mayor a 0, False si no
     def esta_viva(self):
         return self.vida > 0
 
+    # Función para reducir la vida de la unidad
+    # Entradas: cantidad de daño recibido
+    # Salidas: ninguna, actualiza la vida de la unidad
     def recibir_danio(self, cantidad):
+        if self.escudo_activo:
+            cantidad = cantidad // 2
+
         self.vida -= cantidad
+
         if self.vida < 0:
             self.vida = 0
+
+    # Función para aumentar el contador de turnos de la unidad
+    # Entradas: ninguna
+    # Salidas: ninguna, suma un turno al contador
+    def avanzar_turno_habilidad(self):
+        self.contador_turnos += 1
+
+    # Función para verificar si la habilidad de la unidad está lista
+    # Entradas: ninguna
+    # Salidas: True si la habilidad puede activarse, False si no
+    def habilidad_lista(self):
+        return self.contador_turnos >= self.turnos_habilidad
+
+    # Función para reiniciar el contador de habilidad de la unidad
+    # Entradas: ninguna
+    # Salidas: ninguna, reinicia el contador de turnos
+    def reiniciar_habilidad(self):
+        self.contador_turnos = 0
+
+    # Función para verificar si la unidad está congelada
+    # Entradas: ninguna
+    # Salidas: True si tiene turnos de congelamiento, False si no
+    def esta_congelada(self):
+        return self.turnos_congelada > 0
+
+    # Función para reducir los efectos temporales de la unidad
+    # Entradas: ninguna
+    # Salidas: ninguna, reduce congelamiento, escudo y velocidad extra
+    def actualizar_efectos_temporales(self):
+        if self.turnos_congelada > 0:
+            self.turnos_congelada -= 1
+
+        if self.turnos_escudo > 0:
+            self.turnos_escudo -= 1
+
+            if self.turnos_escudo == 0:
+                self.escudo_activo = False
+
+        self.velocidad_extra_temporal = 0
 
 #Clase Muro
 class Muro:
@@ -547,6 +1415,36 @@ def imprimir_mapa_consola(mapa):
 
         print(linea)
 
+# Función para contar cuántas defensas tiene colocadas el defensor
+# Entradas: ninguna
+# Salidas: cantidad de torres y muros colocados en el mapa
+def contar_defensas_colocadas():
+    cantidad = 0
+
+    for fila in range(TAMANIO_MAPA):
+        for columna in range(TAMANIO_MAPA):
+            objeto = mapa_juego[fila][columna]
+
+            if isinstance(objeto, Torre) or isinstance(objeto, Muro):
+                cantidad += 1
+
+    return cantidad
+
+
+# Función para contar cuántas unidades tiene colocadas el atacante
+# Entradas: ninguna
+# Salidas: cantidad de unidades colocadas en el mapa
+def contar_unidades_colocadas():
+    cantidad = 0
+
+    for fila in range(TAMANIO_MAPA):
+        for columna in range(TAMANIO_MAPA):
+            objeto = mapa_juego[fila][columna]
+
+            if isinstance(objeto, Unidad):
+                cantidad += 1
+
+    return cantidad
 
 # -------------------------
 # Estado inicial del juego
@@ -606,11 +1504,17 @@ modo_venta = False
 
 etiqueta_estado = None
 etiqueta_mensaje = None
+etiqueta_info_defensor = None
+etiqueta_info_atacante = None
+
 boton_siguiente_ronda = None
+boton_reiniciar_ronda = None
+boton_salir = None
 
+ventana_juego_actual = None
 
-
-
+botones_defensor = []
+botones_atacante = []
 
 # -------------------------
 # Interfaz gráfica del mapa
@@ -676,18 +1580,304 @@ def obtener_color_casilla(objeto):
 
     return "white"
 
+# Función para cambiar el estado de una lista de botones
+# Entradas: lista de botones y estado deseado
+# Salidas: ninguna, activa o desactiva los botones
+def cambiar_estado_botones(lista_botones, estado):
+    for boton in lista_botones:
+        if boton is not None:
+            boton.config(state=estado)
+
+
+# Función para obtener el texto del objeto seleccionado actualmente
+# Entradas: ninguna
+# Salidas: texto con la selección actual del jugador
+def obtener_texto_seleccion_actual():
+    if modo_venta:
+        return "Modo vender/quitar"
+
+    if fase_actual == "defensor" and defensa_seleccionada is not None:
+        return f"Defensa: {defensa_seleccionada}"
+
+    if fase_actual == "atacante" and unidad_seleccionada is not None:
+        return f"Unidad: {unidad_seleccionada}"
+
+    return "Ninguno"
+
+
+# Función para actualizar los botones según la fase actual
+# Entradas: ninguna
+# Salidas: ninguna, activa o desactiva botones según la fase
+def actualizar_botones_por_fase():
+    if partida_terminada:
+        cambiar_estado_botones(botones_defensor, "disabled")
+        cambiar_estado_botones(botones_atacante, "disabled")
+
+        if boton_siguiente_ronda is not None:
+            boton_siguiente_ronda.config(state="disabled")
+
+        if boton_reiniciar_ronda is not None:
+            boton_reiniciar_ronda.config(state="disabled")
+
+        if boton_salir is not None:
+            boton_salir.config(state="normal")
+
+        return
+
+    if fase_actual == "defensor":
+        cambiar_estado_botones(botones_defensor, "normal")
+        cambiar_estado_botones(botones_atacante, "disabled")
+
+        if boton_siguiente_ronda is not None:
+            boton_siguiente_ronda.config(state="disabled")
+
+        if boton_reiniciar_ronda is not None:
+            boton_reiniciar_ronda.config(state="normal")
+
+    elif fase_actual == "atacante":
+        cambiar_estado_botones(botones_defensor, "disabled")
+        cambiar_estado_botones(botones_atacante, "normal")
+
+        if boton_siguiente_ronda is not None:
+            boton_siguiente_ronda.config(state="disabled")
+
+        if boton_reiniciar_ronda is not None:
+            boton_reiniciar_ronda.config(state="normal")
+
+    elif fase_actual == "combate":
+        cambiar_estado_botones(botones_defensor, "disabled")
+        cambiar_estado_botones(botones_atacante, "disabled")
+
+        if boton_siguiente_ronda is not None:
+            boton_siguiente_ronda.config(state="disabled")
+
+        if boton_reiniciar_ronda is not None:
+            boton_reiniciar_ronda.config(state="disabled")
+
+    elif fase_actual == "fin_ronda":
+        cambiar_estado_botones(botones_defensor, "disabled")
+        cambiar_estado_botones(botones_atacante, "disabled")
+
+        if boton_siguiente_ronda is not None:
+            boton_siguiente_ronda.config(state="normal")
+
+        if boton_reiniciar_ronda is not None:
+            boton_reiniciar_ronda.config(state="disabled")
+
+# Función para crear un botón con estilo visual uniforme
+# Entradas: contenedor, texto, comando, ancho y color de fondo
+# Salidas: botón creado con estilo
+def crear_boton_estilizado(contenedor, texto, comando, ancho=18, color_fondo=COLOR_BOTON):
+    boton = tk.Button(
+        contenedor,
+        text=texto,
+        command=comando,
+        width=ancho,
+        height=2,
+        bg=color_fondo,
+        fg=COLOR_BOTON_TEXTO,
+        activebackground=color_fondo,
+        activeforeground=COLOR_BOTON_TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        font=("Arial", 10, "bold")
+    )
+    return boton
+
+
+# Función para reiniciar la ronda actual sin borrar el marcador
+# Entradas: ninguna
+# Salidas: ninguna, reinicia el mapa y vuelve a fase defensor
+def reiniciar_ronda_actual():
+    global mapa_juego
+    global base_central_actual
+    global dinero_defensor
+    global dinero_atacante
+    global fase_actual
+    global defensa_seleccionada
+    global unidad_seleccionada
+    global modo_venta
+
+    if partida_terminada:
+        etiqueta_mensaje.config(text="La partida ya terminó. No se puede reiniciar la ronda.")
+        return
+
+    mapa_juego, base_central_actual = crear_mapa_inicial()
+
+    dinero_defensor = DINERO_INICIAL_DEFENSOR + ((numero_ronda - 1) * BONO_DINERO_POR_RONDA)
+    dinero_atacante = DINERO_INICIAL_ATACANTE + ((numero_ronda - 1) * BONO_DINERO_POR_RONDA)
+
+    fase_actual = "defensor"
+    defensa_seleccionada = None
+    unidad_seleccionada = None
+    modo_venta = False
+
+    etiqueta_mensaje.config(text=f"La ronda {numero_ronda} fue reiniciada.")
+    actualizar_mapa_visual()
+
+# Función para cerrar la partida actual y volver a selección de facciones
+# Entradas: ventana emergente de resultado
+# Salidas: ninguna, reinicia referencias visuales y abre selección de facciones
+def jugar_otra_partida(ventana_resultado):
+    global ventana_juego_actual
+    global etiqueta_estado
+    global etiqueta_mensaje
+    global etiqueta_info_defensor
+    global etiqueta_info_atacante
+    global boton_siguiente_ronda
+    global boton_reiniciar_ronda
+    global boton_salir
+    global botones_defensor
+    global botones_atacante
+    global botones_mapa
+
+    if ventana_resultado is not None:
+        ventana_resultado.destroy()
+
+    if ventana_juego_actual is not None:
+        ventana_juego_actual.destroy()
+
+    ventana_juego_actual = None
+
+    etiqueta_estado = None
+    etiqueta_mensaje = None
+    etiqueta_info_defensor = None
+    etiqueta_info_atacante = None
+
+    boton_siguiente_ronda = None
+    boton_reiniciar_ronda = None
+    boton_salir = None
+
+    botones_defensor = []
+    botones_atacante = []
+    botones_mapa = []
+
+    reiniciar_estado_partida()
+    abrir_ventana_seleccion_facciones()
+
+
+# Función para mostrar una ventana bonita con el resultado final de la partida
+# Entradas: ganador de la partida y mensaje principal
+# Salidas: ninguna, muestra una ventana emergente final
+def mostrar_resultado_partida(ganador, mensaje_resultado):
+    ventana_resultado = tk.Toplevel(ventana_juego_actual)
+    ventana_resultado.title("Resultado final")
+    ventana_resultado.geometry("540x360")
+    ventana_resultado.resizable(False, False)
+    ventana_resultado.config(bg=COLOR_FONDO_APP)
+    ventana_resultado.grab_set()
+
+    if ganador == "defensor":
+        titulo_resultado = "El Defensor ganó la partida"
+    elif ganador == "atacante":
+        titulo_resultado = "El Atacante ganó la partida"
+    else:
+        titulo_resultado = "Partida finalizada"
+
+    titulo = tk.Label(
+        ventana_resultado,
+        text=titulo_resultado,
+        font=("Arial", 20, "bold"),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TITULO
+    )
+    titulo.pack(pady=(25, 10))
+
+    texto_resultado = tk.Label(
+        ventana_resultado,
+        text=mensaje_resultado,
+        font=("Arial", 12),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO,
+        wraplength=450,
+        justify="center",
+        padx=20,
+        pady=20,
+        relief="solid",
+        bd=1
+    )
+    texto_resultado.pack(pady=10, padx=30, fill="x")
+
+    instruccion = tk.Label(
+        ventana_resultado,
+        text="La partida terminó.\nPuedes jugar otra partida para volver a seleccionar facciones e iniciar desde cero.",
+        font=("Arial", 10),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TEXTO,
+        justify="center"
+    )
+    instruccion.pack(pady=8)
+
+    frame_botones = tk.Frame(
+        ventana_resultado,
+        bg=COLOR_FONDO_APP
+    )
+    frame_botones.pack(pady=15)
+
+    boton_cerrar = crear_boton_estilizado(
+        frame_botones,
+        "Cerrar",
+        ventana_resultado.destroy,
+        ancho=15,
+        color_fondo=COLOR_BOTON_SECUNDARIO
+    )
+    boton_cerrar.grid(row=0, column=0, padx=8)
+
+    boton_nueva_partida = crear_boton_estilizado(
+        frame_botones,
+        "Jugar otra partida",
+        lambda: jugar_otra_partida(ventana_resultado),
+        ancho=18,
+        color_fondo=COLOR_BOTON
+    )
+    boton_nueva_partida.grid(row=0, column=1, padx=8)
+
+
+# Función para cerrar la ventana del juego actual
+# Entradas: ninguna
+# Salidas: ninguna, cierra la ventana principal del juego
+def salir_del_juego():
+    if ventana_juego_actual is not None:
+        ventana_juego_actual.destroy()
+
 
 # Función para actualizar el texto de estado de la partida
 # Entradas: ninguna
-# Salidas: ninguna, actualiza las etiquetas de estado
+# Salidas: ninguna, actualiza etiquetas de estado e información
 def actualizar_estado_visual():
     if etiqueta_estado is not None:
+        seleccion_actual = obtener_texto_seleccion_actual()
+
         etiqueta_estado.config(
-            text=f"Ronda: {numero_ronda} | Fase: {fase_actual.upper()} | "
-                 f"Vida base: {base_central_actual.vida} | "
-                 f"Dinero defensor: {dinero_defensor} | Dinero atacante: {dinero_atacante} | "
-                 f"Marcador: Defensor {rondas_ganadas_defensor} - Atacante {rondas_ganadas_atacante}"
+            text=f"Ronda: {numero_ronda}   |   Fase: {fase_actual.upper()}   |   "
+                 f"Marcador: Defensor {rondas_ganadas_defensor} - Atacante {rondas_ganadas_atacante}\n"
+                 f"Vida base: {base_central_actual.vida}   |   Seleccionado: {seleccion_actual}",
+            bg=COLOR_ESTADO,
+            fg=COLOR_TEXTO
         )
+
+    if etiqueta_info_defensor is not None:
+        etiqueta_info_defensor.config(
+            text=f"Jugador: {NOMBRE_JUGADOR_DEFENSOR}\n"
+                 f"Facción: {faccion_defensor_actual.nombre}\n"
+                 f"Dinero: ${dinero_defensor}\n"
+                 f"Defensas colocadas: {contar_defensas_colocadas()}",
+            bg=COLOR_PANEL,
+            fg=COLOR_TEXTO
+        )
+
+    if etiqueta_info_atacante is not None:
+        etiqueta_info_atacante.config(
+            text=f"Jugador: {NOMBRE_JUGADOR_ATACANTE}\n"
+                 f"Facción: {faccion_atacante_actual.nombre}\n"
+                 f"Dinero: ${dinero_atacante}\n"
+                 f"Unidades colocadas: {contar_unidades_colocadas()}",
+            bg=COLOR_PANEL,
+            fg=COLOR_TEXTO
+        )
+
+    actualizar_botones_por_fase()
 
 
 # Función para actualizar visualmente una casilla del mapa
@@ -733,6 +1923,7 @@ def seleccionar_defensa(tipo_defensa):
     modo_venta = False
 
     etiqueta_mensaje.config(text=f"Defensa seleccionada: {tipo_defensa}")
+    actualizar_estado_visual()
 
 
 # Función para crear una defensa según la selección actual
@@ -754,6 +1945,14 @@ def crear_defensa(tipo_defensa):
 def colocar_defensa(fila, columna):
     global dinero_defensor
 
+    if partida_terminada:
+        etiqueta_mensaje.config(text="La partida ya terminó. No puedes colocar más defensas.")
+        return
+
+    if fase_actual != "defensor":
+        etiqueta_mensaje.config(text="Solo puedes colocar defensas durante la fase del defensor.")
+        return
+    
     if defensa_seleccionada is None:
         etiqueta_mensaje.config(text="Primero selecciona una defensa.")
         return
@@ -795,6 +1994,7 @@ def seleccionar_unidad(tipo_unidad):
     modo_venta = False
 
     etiqueta_mensaje.config(text=f"Unidad seleccionada: {tipo_unidad}")
+    actualizar_estado_visual()
 
 # Función para colocar una unidad atacante en el mapa
 # Entradas: fila y columna donde se desea colocar
@@ -802,6 +2002,13 @@ def seleccionar_unidad(tipo_unidad):
 def colocar_unidad(fila, columna):
     global dinero_atacante
 
+    if partida_terminada:
+        etiqueta_mensaje.config(text="La partida ya terminó. No puedes colocar más unidades.")
+        return
+
+    if fase_actual != "atacante":
+        etiqueta_mensaje.config(text="Solo puedes colocar unidades durante la fase del atacante.")
+        return
     if unidad_seleccionada is None:
         etiqueta_mensaje.config(text="Primero selecciona una unidad.")
         return
@@ -844,6 +2051,7 @@ def activar_modo_venta():
     unidad_seleccionada = None
 
     etiqueta_mensaje.config(text="Modo vender activado. Haz clic sobre el objeto que deseas quitar.")
+    actualizar_estado_visual()
 
 
 # Función para cancelar cualquier selección actual
@@ -859,6 +2067,7 @@ def cancelar_seleccion():
     unidad_seleccionada = None
 
     etiqueta_mensaje.config(text="Selección cancelada.")
+    actualizar_estado_visual()
 
 
 # Función para vender o quitar un objeto del mapa
@@ -868,6 +2077,14 @@ def vender_objeto(fila, columna):
     global dinero_defensor
     global dinero_atacante
     global modo_venta
+
+    if partida_terminada:
+        etiqueta_mensaje.config(text="La partida ya terminó. No puedes vender objetos.")
+        return
+
+    if fase_actual != "defensor" and fase_actual != "atacante":
+        etiqueta_mensaje.config(text="Solo puedes vender antes de iniciar el combate.")
+        return
 
     objeto = mapa_juego[fila][columna]
 
@@ -976,6 +2193,56 @@ def buscar_unidad_en_alcance(torre, fila_torre, columna_torre):
 
     return unidad_mas_cercana
 
+# Función para ejecutar el ataque de una torre aplicando su habilidad especial
+# Entradas: torre, fila de la torre y columna de la torre
+# Salidas: ninguna, aplica daño o efectos a una unidad enemiga
+def ejecutar_ataque_torre_con_habilidad(torre, fila_torre, columna_torre):
+    torre.avanzar_turno_habilidad()
+
+    posicion_objetivo = buscar_unidad_en_alcance(torre, fila_torre, columna_torre)
+
+    if posicion_objetivo is None:
+        return
+
+    fila_unidad, columna_unidad = posicion_objetivo
+    unidad = mapa_juego[fila_unidad][columna_unidad]
+
+    if not isinstance(unidad, Unidad):
+        return
+
+    if torre.habilidad_lista():
+
+        if torre.nombre == "Torre Básica":
+            unidad.recibir_danio(torre.danio)
+            unidad.recibir_danio(torre.danio)
+
+            registrar_evento_combate(
+                f"Habilidad activada: {torre.nombre} usó Disparo doble contra {unidad.nombre}."
+            )
+
+        elif torre.nombre == "Torre Pesada":
+            danio_extra = torre.danio * 2
+            unidad.recibir_danio(danio_extra)
+
+            registrar_evento_combate(
+                f"Habilidad activada: {torre.nombre} hizo daño extra contra {unidad.nombre}."
+            )
+
+        elif torre.nombre == "Torre Mágica":
+            unidad.recibir_danio(torre.danio)
+            unidad.turnos_congelada = 1
+
+            registrar_evento_combate(
+                f"Habilidad activada: {torre.nombre} congeló a {unidad.nombre} por 1 turno."
+            )
+
+        else:
+            unidad.recibir_danio(torre.danio)
+
+        torre.reiniciar_habilidad()
+
+    else:
+        unidad.recibir_danio(torre.danio)
 
 # Función para eliminar unidades derrotadas del mapa
 # Entradas: ninguna
@@ -992,29 +2259,43 @@ def eliminar_unidades_derrotadas():
                 dinero_defensor += dinero_ganado
                 mapa_juego[fila][columna] = None
 
+# Función para actualizar los escudos temporales de las unidades
+# Entradas: ninguna
+# Salidas: ninguna, reduce duración del escudo y lo desactiva si termina
+def actualizar_escudos_unidades():
+    posiciones_unidades = obtener_posiciones_unidades()
+
+    for fila, columna in posiciones_unidades:
+        unidad = mapa_juego[fila][columna]
+
+        if isinstance(unidad, Unidad) and unidad.turnos_escudo > 0:
+            unidad.turnos_escudo -= 1
+
+            if unidad.turnos_escudo == 0:
+                unidad.escudo_activo = False
+                registrar_evento_combate(f"El escudo de {unidad.nombre} terminó.")
+
 
 # Función para hacer que las torres ataquen a las unidades
 # Entradas: ninguna
-# Salidas: ninguna, aplica daño a unidades dentro del alcance
+# Salidas: ninguna, aplica daño y habilidades a unidades dentro del alcance
 def ejecutar_ataque_torres():
     posiciones_torres = obtener_posiciones_torres()
 
     for fila_torre, columna_torre in posiciones_torres:
         torre = mapa_juego[fila_torre][columna_torre]
 
-        if not isinstance(torre, Torre):
-            continue
-
-        posicion_objetivo = buscar_unidad_en_alcance(torre, fila_torre, columna_torre)
-
-        if posicion_objetivo is not None:
-            fila_unidad, columna_unidad = posicion_objetivo
-            unidad = mapa_juego[fila_unidad][columna_unidad]
-
-            if isinstance(unidad, Unidad):
-                unidad.recibir_danio(torre.danio)
+        if isinstance(torre, Torre):
+            ejecutar_ataque_torre_con_habilidad(torre, fila_torre, columna_torre)
 
     eliminar_unidades_derrotadas()
+    actualizar_escudos_unidades()
+
+# Función para registrar eventos importantes del combate
+# Entradas: mensaje del evento
+# Salidas: ninguna, muestra el evento en consola
+def registrar_evento_combate(mensaje):
+    print(mensaje)
 
 
 # Función para obtener posibles pasos hacia la base central
@@ -1050,6 +2331,72 @@ def obtener_pasos_hacia_base(fila, columna):
 
     return pasos
 
+# Función para preparar la habilidad de una unidad antes de actuar
+# Entradas: unidad atacante
+# Salidas: ninguna, activa habilidad si corresponde
+def preparar_habilidad_unidad(unidad):
+    unidad.avanzar_turno_habilidad()
+
+    if unidad.nombre == "Tanque" and unidad.habilidad_lista():
+        unidad.escudo_activo = True
+        unidad.turnos_escudo = 1
+        unidad.reiniciar_habilidad()
+
+        registrar_evento_combate(
+            f"Habilidad activada: {unidad.nombre} activó Escudo temporal."
+        )
+
+    elif unidad.nombre == "Unidad Rápida" and unidad.habilidad_lista():
+        unidad.velocidad_extra_temporal = 1
+        unidad.reiniciar_habilidad()
+
+        registrar_evento_combate(
+            f"Habilidad activada: {unidad.nombre} activó Aumento de velocidad."
+        )
+
+
+# Función para obtener cuántas veces ataca una unidad
+# Entradas: unidad atacante
+# Salidas: cantidad de ataques que realizará
+def obtener_cantidad_ataques_unidad(unidad):
+    if unidad.nombre == "Soldado" and unidad.habilidad_lista():
+        unidad.reiniciar_habilidad()
+
+        registrar_evento_combate(
+            f"Habilidad activada: {unidad.nombre} usó Ataque doble."
+        )
+
+        return 2
+
+    return 1
+
+
+# Función para hacer que una unidad ataque un objetivo
+# Entradas: unidad, objetivo, fila del objetivo y columna del objetivo
+# Salidas: ninguna, aplica daño al objetivo
+def unidad_ataca_objetivo(unidad, objetivo, fila_objetivo, columna_objetivo):
+    cantidad_ataques = obtener_cantidad_ataques_unidad(unidad)
+
+    for ataque in range(cantidad_ataques):
+        if isinstance(objetivo, BaseCentral):
+            objetivo.recibir_danio(unidad.danio)
+
+            if not objetivo.esta_viva():
+                return
+
+        elif isinstance(objetivo, Muro):
+            objetivo.recibir_danio(unidad.danio)
+
+            if not objetivo.esta_vivo():
+                mapa_juego[fila_objetivo][columna_objetivo] = None
+                return
+
+        elif isinstance(objetivo, Torre):
+            objetivo.recibir_danio(unidad.danio)
+
+            if not objetivo.esta_viva():
+                mapa_juego[fila_objetivo][columna_objetivo] = None
+                return
 
 # Función para mover una unidad o atacar un obstáculo cercano
 # Entradas: fila y columna de la unidad
@@ -1060,7 +2407,20 @@ def mover_o_atacar_unidad(fila, columna):
     if not isinstance(unidad, Unidad):
         return
 
-    for movimiento in range(unidad.velocidad):
+    if unidad.esta_congelada():
+        registrar_evento_combate(
+            f"{unidad.nombre} está congelada y pierde su turno."
+        )
+
+        unidad.actualizar_efectos_temporales()
+        return
+
+    preparar_habilidad_unidad(unidad)
+
+    velocidad_turno = unidad.velocidad + unidad.velocidad_extra_temporal
+    unidad.velocidad_extra_temporal = 0
+
+    for movimiento in range(velocidad_turno):
         if not unidad.esta_viva() or not base_central_actual.esta_viva():
             return
 
@@ -1083,22 +2443,15 @@ def mover_o_atacar_unidad(fila, columna):
                 break
 
             if isinstance(objetivo, BaseCentral):
-                objetivo.recibir_danio(unidad.danio)
+                unidad_ataca_objetivo(unidad, objetivo, nueva_fila, nueva_columna)
                 accion_realizada = True
                 return
 
             if isinstance(objetivo, Muro) or isinstance(objetivo, Torre):
-                objetivo.recibir_danio(unidad.danio)
-
-                if isinstance(objetivo, Muro) and not objetivo.esta_vivo():
-                    mapa_juego[nueva_fila][nueva_columna] = None
-
-                if isinstance(objetivo, Torre) and not objetivo.esta_viva():
-                    mapa_juego[nueva_fila][nueva_columna] = None
-
+                unidad_ataca_objetivo(unidad, objetivo, nueva_fila, nueva_columna)
                 accion_realizada = True
                 return
-            
+
         if not accion_realizada:
             return
 
@@ -1172,6 +2525,9 @@ def registrar_ganador_ronda(ganador):
 
     actualizar_mapa_visual()
 
+    if partida_terminada:
+        mostrar_resultado_partida(ganador, mensaje)
+
 
 # Función para preparar una nueva ronda
 # Entradas: ninguna
@@ -1230,7 +2586,7 @@ def ejecutar_combate():
         etiqueta_mensaje.config(text="Primero debe terminar la fase del defensor.")
         return
 
-    if len(obtener_posiciones_unidades()) == 0:
+    if contar_unidades_colocadas() == 0:
         etiqueta_mensaje.config(text="El atacante debe colocar al menos una unidad antes de combatir.")
         return
 
@@ -1277,11 +2633,26 @@ def manejar_click_casilla(fila, columna):
 # Función para terminar la fase del defensor
 # Entradas: ninguna
 # Salidas: ninguna, cambia la fase actual a atacante
+# Función para terminar la fase del defensor
+# Entradas: ninguna
+# Salidas: ninguna, cambia la fase actual a atacante si hay defensas colocadas
 def terminar_fase_defensor():
     global fase_actual
     global defensa_seleccionada
     global unidad_seleccionada
     global modo_venta
+
+    if partida_terminada:
+        etiqueta_mensaje.config(text="La partida ya terminó.")
+        return
+
+    if fase_actual != "defensor":
+        etiqueta_mensaje.config(text="Solo puedes terminar la fase durante el turno del defensor.")
+        return
+
+    if contar_defensas_colocadas() == 0:
+        etiqueta_mensaje.config(text="Debes colocar al menos una torre o muro antes de pasar al atacante.")
+        return
 
     fase_actual = "atacante"
     defensa_seleccionada = None
@@ -1321,15 +2692,33 @@ def crear_botones_mapa(frame_mapa):
 
     actualizar_mapa_visual()
 
-# Función para iniciar la partida con las facciones seleccionadas
-# Entradas: ventana de selección, facción del defensor y facción del atacante
-# Salidas: ninguna, valida facciones y abre el mapa del juego
-def iniciar_partida_con_facciones(ventana_seleccion, seleccion_defensor, seleccion_atacante, etiqueta_error):
+# Función para iniciar la partida con jugadores, roles y facciones seleccionadas
+# Entradas: ventana, jugadores, roles, facciones y etiqueta de error
+# Salidas: ninguna, valida datos y abre el mapa del juego
+def iniciar_partida_con_roles_y_facciones(
+    ventana_seleccion,
+    jugador_1,
+    jugador_2,
+    seleccion_defensor,
+    seleccion_atacante,
+    seleccion_faccion_defensor,
+    seleccion_faccion_atacante,
+    etiqueta_error
+):
     global faccion_defensor_actual
     global faccion_atacante_actual
+    global NOMBRE_JUGADOR_DEFENSOR
+    global NOMBRE_JUGADOR_ATACANTE
 
-    nombre_faccion_defensor = seleccion_defensor.get()
-    nombre_faccion_atacante = seleccion_atacante.get()
+    nombre_defensor = seleccion_defensor.get()
+    nombre_atacante = seleccion_atacante.get()
+
+    nombre_faccion_defensor = seleccion_faccion_defensor.get()
+    nombre_faccion_atacante = seleccion_faccion_atacante.get()
+
+    if nombre_defensor == nombre_atacante:
+        etiqueta_error.config(text="Un mismo jugador no puede ser defensor y atacante.")
+        return
 
     faccion_defensor = obtener_faccion(nombre_faccion_defensor)
     faccion_atacante = obtener_faccion(nombre_faccion_atacante)
@@ -1342,6 +2731,9 @@ def iniciar_partida_con_facciones(ventana_seleccion, seleccion_defensor, selecci
         etiqueta_error.config(text="El defensor y el atacante no pueden usar la misma facción.")
         return
 
+    NOMBRE_JUGADOR_DEFENSOR = nombre_defensor
+    NOMBRE_JUGADOR_ATACANTE = nombre_atacante
+
     faccion_defensor_actual = faccion_defensor
     faccion_atacante_actual = faccion_atacante
 
@@ -1351,273 +2743,549 @@ def iniciar_partida_con_facciones(ventana_seleccion, seleccion_defensor, selecci
     abrir_ventana_mapa()
 
 
-# Función para abrir la pantalla de selección de facciones
-# Entradas: ninguna
-# Salidas: ninguna, muestra la ventana para elegir facciones
-def abrir_ventana_seleccion_facciones():
+# Función para abrir la pantalla de selección de roles y facciones
+# Entradas: nombre del jugador 1 y nombre del jugador 2
+# Salidas: ninguna, muestra ventana para elegir roles y facciones
+def abrir_ventana_seleccion_facciones(jugador_1="Jugador 1", jugador_2="Jugador 2"):
     ventana_seleccion = tk.Tk()
-    ventana_seleccion.title("Selección de facciones")
-    ventana_seleccion.geometry("500x400")
+    ventana_seleccion.title("Selección de roles y facciones")
+    ventana_seleccion.geometry("760x600")
     ventana_seleccion.resizable(False, False)
+    ventana_seleccion.config(bg=COLOR_FONDO_APP)
 
     titulo = tk.Label(
         ventana_seleccion,
-        text="Selección de Facciones",
-        font=("Arial", 18, "bold")
+        text="Preparar Partida",
+        font=("Arial", 22, "bold"),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TITULO
     )
-    titulo.pack(pady=20)
+    titulo.pack(pady=(25, 8))
 
     descripcion = tk.Label(
         ventana_seleccion,
-        text="Elige una facción para cada jugador.\nNo pueden usar la misma facción.",
-        font=("Arial", 11)
+        text="Seleccionen los roles y facciones antes de iniciar la batalla.",
+        font=("Arial", 11),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TEXTO
     )
-    descripcion.pack(pady=5)
+    descripcion.pack(pady=(0, 18))
 
+    frame_principal = tk.Frame(
+        ventana_seleccion,
+        bg=COLOR_FONDO_APP
+    )
+    frame_principal.pack(padx=25, pady=10, fill="both", expand=True)
+
+    panel_jugadores = tk.Frame(
+        frame_principal,
+        bg=COLOR_PANEL,
+        bd=1,
+        relief="solid"
+    )
+    panel_jugadores.grid(row=0, column=0, padx=12, pady=10, sticky="nsew")
+
+    panel_configuracion = tk.Frame(
+        frame_principal,
+        bg=COLOR_PANEL,
+        bd=1,
+        relief="solid"
+    )
+    panel_configuracion.grid(row=0, column=1, padx=12, pady=10, sticky="nsew")
+
+    titulo_jugadores = tk.Label(
+        panel_jugadores,
+        text="Jugadores",
+        font=("Arial", 16, "bold"),
+        bg=COLOR_PANEL,
+        fg=COLOR_TITULO
+    )
+    titulo_jugadores.pack(pady=(18, 12))
+
+    tarjeta_jugador_1 = tk.Label(
+        panel_jugadores,
+        text=f"Jugador 1\n{jugador_1}",
+        font=("Arial", 12, "bold"),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TEXTO,
+        width=22,
+        height=4,
+        relief="solid",
+        bd=1
+    )
+    tarjeta_jugador_1.pack(pady=10, padx=25)
+
+    tarjeta_jugador_2 = tk.Label(
+        panel_jugadores,
+        text=f"Jugador 2\n{jugador_2}",
+        font=("Arial", 12, "bold"),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TEXTO,
+        width=22,
+        height=4,
+        relief="solid",
+        bd=1
+    )
+    tarjeta_jugador_2.pack(pady=10, padx=25)
+
+    nota = tk.Label(
+        panel_jugadores,
+        text="Cada jugador debe tener un rol distinto.",
+        font=("Arial", 10),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO,
+        wraplength=220,
+        justify="center"
+    )
+    nota.pack(pady=15)
+
+    titulo_configuracion = tk.Label(
+        panel_configuracion,
+        text="Roles y Facciones",
+        font=("Arial", 16, "bold"),
+        bg=COLOR_PANEL,
+        fg=COLOR_TITULO
+    )
+    titulo_configuracion.pack(pady=(18, 15))
+
+    nombres_jugadores = [jugador_1, jugador_2]
     nombres_facciones = list(FACCIONES.keys())
 
     seleccion_defensor = tk.StringVar(ventana_seleccion)
-    seleccion_defensor.set(nombres_facciones[0])
+    seleccion_defensor.set(jugador_1)
 
     seleccion_atacante = tk.StringVar(ventana_seleccion)
-    seleccion_atacante.set(nombres_facciones[2])
+    seleccion_atacante.set(jugador_2)
 
-    frame_opciones = tk.Frame(ventana_seleccion)
-    frame_opciones.pack(pady=20)
+    seleccion_faccion_defensor = tk.StringVar(ventana_seleccion)
+    seleccion_faccion_defensor.set(nombres_facciones[0])
+
+    seleccion_faccion_atacante = tk.StringVar(ventana_seleccion)
+    seleccion_faccion_atacante.set(nombres_facciones[2])
+
+    frame_formulario = tk.Frame(
+        panel_configuracion,
+        bg=COLOR_PANEL
+    )
+    frame_formulario.pack(padx=20, pady=5)
 
     etiqueta_defensor = tk.Label(
-        frame_opciones,
-        text="Facción del defensor:",
-        font=("Arial", 11, "bold")
+        frame_formulario,
+        text="Defensor:",
+        font=("Arial", 11, "bold"),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO
     )
-    etiqueta_defensor.grid(row=0, column=0, padx=10, pady=10, sticky="e")
+    etiqueta_defensor.grid(row=0, column=0, padx=8, pady=8, sticky="e")
 
     menu_defensor = tk.OptionMenu(
-        frame_opciones,
+        frame_formulario,
         seleccion_defensor,
+        *nombres_jugadores
+    )
+    menu_defensor.config(width=18, bg=COLOR_ESTADO, fg=COLOR_TEXTO, relief="flat")
+    menu_defensor.grid(row=0, column=1, padx=8, pady=8)
+
+    etiqueta_faccion_defensor = tk.Label(
+        frame_formulario,
+        text="Facción defensor:",
+        font=("Arial", 11, "bold"),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO
+    )
+    etiqueta_faccion_defensor.grid(row=1, column=0, padx=8, pady=8, sticky="e")
+
+    menu_faccion_defensor = tk.OptionMenu(
+        frame_formulario,
+        seleccion_faccion_defensor,
         *nombres_facciones
     )
-    menu_defensor.config(width=18)
-    menu_defensor.grid(row=0, column=1, padx=10, pady=10)
+    menu_faccion_defensor.config(width=18, bg=COLOR_ESTADO, fg=COLOR_TEXTO, relief="flat")
+    menu_faccion_defensor.grid(row=1, column=1, padx=8, pady=8)
+
+    separador = tk.Frame(
+        panel_configuracion,
+        bg=COLOR_BORDE,
+        height=1
+    )
+    separador.pack(fill="x", padx=35, pady=12)
 
     etiqueta_atacante = tk.Label(
-        frame_opciones,
-        text="Facción del atacante:",
-        font=("Arial", 11, "bold")
+        frame_formulario,
+        text="Atacante:",
+        font=("Arial", 11, "bold"),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO
     )
-    etiqueta_atacante.grid(row=1, column=0, padx=10, pady=10, sticky="e")
+    etiqueta_atacante.grid(row=2, column=0, padx=8, pady=8, sticky="e")
 
     menu_atacante = tk.OptionMenu(
-        frame_opciones,
+        frame_formulario,
         seleccion_atacante,
+        *nombres_jugadores
+    )
+    menu_atacante.config(width=18, bg=COLOR_ESTADO, fg=COLOR_TEXTO, relief="flat")
+    menu_atacante.grid(row=2, column=1, padx=8, pady=8)
+
+    etiqueta_faccion_atacante = tk.Label(
+        frame_formulario,
+        text="Facción atacante:",
+        font=("Arial", 11, "bold"),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO
+    )
+    etiqueta_faccion_atacante.grid(row=3, column=0, padx=8, pady=8, sticky="e")
+
+    menu_faccion_atacante = tk.OptionMenu(
+        frame_formulario,
+        seleccion_faccion_atacante,
         *nombres_facciones
     )
-    menu_atacante.config(width=18)
-    menu_atacante.grid(row=1, column=1, padx=10, pady=10)
+    menu_faccion_atacante.config(width=18, bg=COLOR_ESTADO, fg=COLOR_TEXTO, relief="flat")
+    menu_faccion_atacante.grid(row=3, column=1, padx=8, pady=8)
 
     etiqueta_error = tk.Label(
         ventana_seleccion,
         text="",
         fg="red",
-        font=("Arial", 10)
+        bg=COLOR_FONDO_APP,
+        font=("Arial", 10, "bold")
     )
     etiqueta_error.pack(pady=5)
 
-    boton_iniciar = tk.Button(
+    boton_iniciar = crear_boton_estilizado(
         ventana_seleccion,
-        text="Iniciar partida",
-        width=20,
-        height=2,
-        command=lambda: iniciar_partida_con_facciones(
+        "Iniciar partida",
+        lambda: iniciar_partida_con_roles_y_facciones(
             ventana_seleccion,
+            jugador_1,
+            jugador_2,
             seleccion_defensor,
             seleccion_atacante,
+            seleccion_faccion_defensor,
+            seleccion_faccion_atacante,
             etiqueta_error
-        )
+        ),
+        ancho=24,
+        color_fondo=COLOR_BOTON
     )
-    boton_iniciar.pack(pady=20)
+    boton_iniciar.pack(pady=18)
 
     ventana_seleccion.mainloop()
 
 # Función para abrir la ventana del mapa del juego
 # Entradas: ninguna
-# Salidas: ninguna, muestra la ventana del mapa
+# Salidas: ninguna, muestra la ventana del mapa con diseño mejorado
 def abrir_ventana_mapa():
     global etiqueta_estado
     global etiqueta_mensaje
+    global etiqueta_info_defensor
+    global etiqueta_info_atacante
+    global boton_siguiente_ronda
+    global boton_reiniciar_ronda
+    global boton_salir
+    global botones_defensor
+    global botones_atacante
+    global ventana_juego_actual
 
-    ventana_juego = tk.Tk()
-    ventana_juego.title("Defensa y Asalto de Base - Mapa")
-    ventana_juego.geometry("1250x780")
+    botones_defensor = []
+    botones_atacante = []
+
+    ventana_juego_actual = tk.Tk()
+    ventana_juego_actual.title("Defensa y Asalto de Base")
+    ventana_juego_actual.geometry("1450x850")
+    ventana_juego_actual.config(bg=COLOR_FONDO_APP)
 
     titulo = tk.Label(
-        ventana_juego,
+        ventana_juego_actual,
         text="Defensa y Asalto de Base",
-        font=("Arial", 18, "bold")
+        font=("Arial", 22, "bold"),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TITULO
     )
-    titulo.pack(pady=10)
-
-    informacion = tk.Label(
-        ventana_juego,
-        text=f"Defensor: {faccion_defensor_actual.nombre} | Atacante: {faccion_atacante_actual.nombre}"
-    )
-    informacion.pack()
+    titulo.pack(pady=15)
 
     etiqueta_estado = tk.Label(
-        ventana_juego,
-        text=""
+        ventana_juego_actual,
+        text="",
+        font=("Arial", 11, "bold"),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TEXTO,
+        padx=15,
+        pady=10,
+        relief="solid",
+        bd=1
     )
-    etiqueta_estado.pack(pady=5)
+    etiqueta_estado.pack(pady=5, padx=25, fill="x")
 
-    contenedor_principal = tk.Frame(ventana_juego)
-    contenedor_principal.pack(pady=10)
+    contenedor_principal = tk.Frame(
+        ventana_juego_actual,
+        bg=COLOR_FONDO_APP
+    )
+    contenedor_principal.pack(pady=15, padx=20, fill="both", expand=True)
 
-    panel_defensor = tk.LabelFrame(
+    contenedor_principal.grid_columnconfigure(0, weight=1)
+    contenedor_principal.grid_columnconfigure(1, weight=2)
+    contenedor_principal.grid_columnconfigure(2, weight=1)
+
+    # Panel defensor
+    panel_defensor = tk.Frame(
         contenedor_principal,
-        text="Fase defensor",
-        padx=10,
-        pady=10
+        bg=COLOR_PANEL,
+        bd=1,
+        relief="solid"
     )
-    panel_defensor.grid(row=0, column=0, padx=15, sticky="n")
+    panel_defensor.grid(row=0, column=0, sticky="ns", padx=12)
 
-    boton_muro = tk.Button(
+    titulo_defensor = tk.Label(
         panel_defensor,
-        text="Muro - $30",
-        width=18,
-        command=lambda: seleccionar_defensa("Muro")
+        text=NOMBRE_JUGADOR_DEFENSOR,
+        font=("Arial", 16, "bold"),
+        bg=COLOR_PANEL,
+        fg=COLOR_TITULO
     )
-    boton_muro.pack(pady=5)
+    titulo_defensor.pack(pady=(15, 5))
 
-    boton_torre_basica = tk.Button(
+    subtitulo_defensor = tk.Label(
         panel_defensor,
-        text="Torre Básica - $50",
-        width=18,
-        command=lambda: seleccionar_defensa("Basica")
+        text="Panel del Defensor",
+        font=("Arial", 11),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO
     )
-    boton_torre_basica.pack(pady=5)
+    subtitulo_defensor.pack(pady=(0, 10))
 
-    boton_torre_pesada = tk.Button(
+    boton_muro = crear_boton_estilizado(
         panel_defensor,
-        text="Torre Pesada - $90",
-        width=18,
-        command=lambda: seleccionar_defensa("Pesada")
+        "Muro - $30",
+        lambda: seleccionar_defensa("Muro")
     )
-    boton_torre_pesada.pack(pady=5)
+    boton_muro.pack(pady=6, padx=20)
 
-    boton_torre_magica = tk.Button(
+    boton_torre_basica = crear_boton_estilizado(
         panel_defensor,
-        text="Torre Mágica - $75",
-        width=18,
-        command=lambda: seleccionar_defensa("Magica")
+        "Torre Básica - $50",
+        lambda: seleccionar_defensa("Basica")
     )
-    boton_torre_magica.pack(pady=5)
+    boton_torre_basica.pack(pady=6, padx=20)
 
-    boton_vender_defensor = tk.Button(
+    boton_torre_pesada = crear_boton_estilizado(
         panel_defensor,
-        text="Vender / quitar",
-        width=18,
-        command=activar_modo_venta
+        "Torre Pesada - $90",
+        lambda: seleccionar_defensa("Pesada")
     )
-    boton_vender_defensor.pack(pady=5)
+    boton_torre_pesada.pack(pady=6, padx=20)
 
-    boton_cancelar_defensor = tk.Button(
+    boton_torre_magica = crear_boton_estilizado(
         panel_defensor,
-        text="Cancelar selección",
-        width=18,
-        command=cancelar_seleccion
+        "Torre Mágica - $75",
+        lambda: seleccionar_defensa("Magica")
     )
-    boton_cancelar_defensor.pack(pady=5)
+    boton_torre_magica.pack(pady=6, padx=20)
 
-    boton_terminar = tk.Button(
+    boton_vender_defensor = crear_boton_estilizado(
         panel_defensor,
-        text="Terminar fase defensor",
-        width=18,
-        command=terminar_fase_defensor
+        "Vender / Quitar",
+        activar_modo_venta,
+        color_fondo=COLOR_BOTON_SECUNDARIO
     )
-    boton_terminar.pack(pady=15)
+    boton_vender_defensor.pack(pady=6, padx=20)
 
-    panel_atacante = tk.LabelFrame(
+    boton_cancelar_defensor = crear_boton_estilizado(
+        panel_defensor,
+        "Cancelar selección",
+        cancelar_seleccion,
+        color_fondo=COLOR_BOTON_SECUNDARIO
+    )
+    boton_cancelar_defensor.pack(pady=6, padx=20)
+
+    boton_terminar = crear_boton_estilizado(
+        panel_defensor,
+        "Terminar fase",
+        terminar_fase_defensor
+    )
+    boton_terminar.pack(pady=10, padx=20)
+
+    etiqueta_info_defensor = tk.Label(
+        panel_defensor,
+        text="",
+        justify="left",
+        font=("Arial", 11),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO,
+        padx=12,
+        pady=12
+    )
+    etiqueta_info_defensor.pack(pady=15)
+
+    botones_defensor = [
+        boton_muro,
+        boton_torre_basica,
+        boton_torre_pesada,
+        boton_torre_magica,
+        boton_vender_defensor,
+        boton_cancelar_defensor,
+        boton_terminar
+    ]
+
+    # Panel central
+    panel_central = tk.Frame(
         contenedor_principal,
-        text="Fase atacante",
-        padx=10,
-        pady=10
+        bg=COLOR_FONDO_APP
     )
-    panel_atacante.grid(row=0, column=2, padx=15, sticky="n")
+    panel_central.grid(row=0, column=1, sticky="n")
 
-    boton_soldado = tk.Button(
-        panel_atacante,
-        text="Soldado - $40",
-        width=18,
-        command=lambda: seleccionar_unidad("Soldado")
+    frame_mapa = tk.Frame(
+        panel_central,
+        bg=COLOR_PANEL,
+        bd=1,
+        relief="solid"
     )
-    boton_soldado.pack(pady=5)
-
-    boton_tanque = tk.Button(
-        panel_atacante,
-        text="Tanque - $90",
-        width=18,
-        command=lambda: seleccionar_unidad("Tanque")
-    )
-    boton_tanque.pack(pady=5)
-
-    boton_rapida = tk.Button(
-        panel_atacante,
-        text="Unidad Rápida - $60",
-        width=18,
-        command=lambda: seleccionar_unidad("Rapida")
-    )
-    boton_rapida.pack(pady=5)
-
-    boton_vender_atacante = tk.Button(
-        panel_atacante,
-        text="Vender / quitar",
-        width=18,
-        command=activar_modo_venta
-    )
-    boton_vender_atacante.pack(pady=5)
-
-    boton_cancelar_atacante = tk.Button(
-        panel_atacante,
-        text="Cancelar selección",
-        width=18,
-        command=cancelar_seleccion
-    )
-    boton_cancelar_atacante.pack(pady=5)
-
-    boton_combate = tk.Button(
-        panel_atacante,
-        text="Ejecutar combate",
-        width=18,
-        command=ejecutar_combate
-    )
-    boton_combate.pack(pady=15)
-
-    global boton_siguiente_ronda
-
-    boton_siguiente_ronda = tk.Button(
-        panel_atacante,
-        text="Siguiente ronda",
-        width=18,
-        state="disabled",
-        command=preparar_siguiente_ronda
-    )
-    boton_siguiente_ronda.pack(pady=5)
-
-    frame_mapa = tk.Frame(contenedor_principal)
-    frame_mapa.grid(row=0, column=1)
+    frame_mapa.pack(pady=10)
 
     crear_botones_mapa(frame_mapa)
 
+    panel_acciones = tk.Frame(
+        panel_central,
+        bg=COLOR_FONDO_APP
+    )
+    panel_acciones.pack(pady=18)
+
+    boton_combate = crear_boton_estilizado(
+        panel_acciones,
+        "Ejecutar combate",
+        ejecutar_combate,
+        ancho=18
+    )
+    boton_combate.grid(row=0, column=0, padx=8, pady=5)
+
+    boton_siguiente_ronda = crear_boton_estilizado(
+        panel_acciones,
+        "Siguiente ronda",
+        preparar_siguiente_ronda,
+        ancho=18,
+        color_fondo=COLOR_BOTON_SECUNDARIO
+    )
+    boton_siguiente_ronda.grid(row=0, column=1, padx=8, pady=5)
+
+    boton_reiniciar_ronda = crear_boton_estilizado(
+        panel_acciones,
+        "Reiniciar ronda",
+        reiniciar_ronda_actual,
+        ancho=18,
+        color_fondo=COLOR_BOTON_SECUNDARIO
+    )
+    boton_reiniciar_ronda.grid(row=0, column=2, padx=8, pady=5)
+
+    boton_salir = crear_boton_estilizado(
+        panel_acciones,
+        "Salir",
+        salir_del_juego,
+        ancho=18,
+        color_fondo=COLOR_BOTON_ALERTA
+    )
+    boton_salir.grid(row=0, column=3, padx=8, pady=5)
+
     etiqueta_mensaje = tk.Label(
-        ventana_juego,
-        text="Selecciona una defensa y luego presiona una casilla vacía.",
-        font=("Arial", 10)
+        panel_central,
+        text="Selecciona una opción para comenzar.",
+        font=("Arial", 11),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TEXTO,
+        wraplength=700,
+        justify="center"
     )
     etiqueta_mensaje.pack(pady=10)
 
+    # Panel atacante
+    panel_atacante = tk.Frame(
+        contenedor_principal,
+        bg=COLOR_PANEL,
+        bd=1,
+        relief="solid"
+    )
+    panel_atacante.grid(row=0, column=2, sticky="ns", padx=12)
+
+    titulo_atacante = tk.Label(
+        panel_atacante,
+        text=NOMBRE_JUGADOR_ATACANTE,
+        font=("Arial", 16, "bold"),
+        bg=COLOR_PANEL,
+        fg=COLOR_TITULO
+    )
+    titulo_atacante.pack(pady=(15, 5))
+
+    subtitulo_atacante = tk.Label(
+        panel_atacante,
+        text="Panel del Atacante",
+        font=("Arial", 11),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO
+    )
+    subtitulo_atacante.pack(pady=(0, 10))
+
+    boton_soldado = crear_boton_estilizado(
+        panel_atacante,
+        "Soldado - $40",
+        lambda: seleccionar_unidad("Soldado")
+    )
+    boton_soldado.pack(pady=6, padx=20)
+
+    boton_tanque = crear_boton_estilizado(
+        panel_atacante,
+        "Tanque - $90",
+        lambda: seleccionar_unidad("Tanque")
+    )
+    boton_tanque.pack(pady=6, padx=20)
+
+    boton_rapida = crear_boton_estilizado(
+        panel_atacante,
+        "Unidad Rápida - $60",
+        lambda: seleccionar_unidad("Rapida")
+    )
+    boton_rapida.pack(pady=6, padx=20)
+
+    boton_vender_atacante = crear_boton_estilizado(
+        panel_atacante,
+        "Vender / Quitar",
+        activar_modo_venta,
+        color_fondo=COLOR_BOTON_SECUNDARIO
+    )
+    boton_vender_atacante.pack(pady=6, padx=20)
+
+    boton_cancelar_atacante = crear_boton_estilizado(
+        panel_atacante,
+        "Cancelar selección",
+        cancelar_seleccion,
+        color_fondo=COLOR_BOTON_SECUNDARIO
+    )
+    boton_cancelar_atacante.pack(pady=6, padx=20)
+
+    etiqueta_info_atacante = tk.Label(
+        panel_atacante,
+        text="",
+        justify="left",
+        font=("Arial", 11),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO,
+        padx=12,
+        pady=12
+    )
+    etiqueta_info_atacante.pack(pady=15)
+
+    botones_atacante = [
+        boton_soldado,
+        boton_tanque,
+        boton_rapida,
+        boton_vender_atacante,
+        boton_cancelar_atacante,
+        boton_combate
+    ]
+
     actualizar_estado_visual()
+    actualizar_botones_por_fase()
 
-    ventana_juego.mainloop()
+    ventana_juego_actual.mainloop()
 
 
-abrir_ventana_seleccion_facciones()
+abrir_ventana_seleccion_facciones("Fabian", "Compañero")
