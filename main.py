@@ -232,62 +232,86 @@ def obtener_top_jugadores(rol):
 
 
 # Función para abrir la ventana principal del sistema de usuarios.
-# Desde esta ventana se puede registrar, iniciar sesión o ver el ranking.
+# Desde esta ventana se puede registrar, iniciar sesión, ver ranking o salir.
 def abrir_ventana_inicio():
     crear_archivo_usuarios()
 
     ventana_inicio = tk.Tk()
     ventana_inicio.title("Defensa y Asalto de Base - Inicio")
-    ventana_inicio.geometry("480x380")
+    ventana_inicio.geometry("620x500")
     ventana_inicio.resizable(False, False)
+    ventana_inicio.config(bg=COLOR_FONDO_APP)
 
     titulo = tk.Label(
         ventana_inicio,
         text="Defensa y Asalto de Base",
-        font=("Arial", 18, "bold")
+        font=("Arial", 24, "bold"),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TITULO
     )
-    titulo.pack(pady=25)
+    titulo.pack(pady=(35, 8))
 
     subtitulo = tk.Label(
         ventana_inicio,
-        text="Sistema de usuarios",
-        font=("Arial", 12)
+        text="Sistema de jugadores",
+        font=("Arial", 12, "bold"),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TEXTO
     )
-    subtitulo.pack(pady=5)
+    subtitulo.pack(pady=(0, 18))
 
-    boton_registro = tk.Button(
+    panel = tk.Frame(
         ventana_inicio,
-        text="Registrar usuario",
-        width=25,
-        height=2,
-        command=lambda: abrir_ventana_registro(ventana_inicio)
+        bg=COLOR_PANEL,
+        bd=1,
+        relief="solid"
+    )
+    panel.pack(padx=70, pady=20, fill="both", expand=True)
+
+    descripcion = tk.Label(
+        panel,
+        text="Registra jugadores, inicia una partida o consulta el ranking.",
+        font=("Arial", 11),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO,
+        wraplength=380,
+        justify="center"
+    )
+    descripcion.pack(pady=(30, 18))
+
+    boton_registro = crear_boton_estilizado(
+        panel,
+        "Registrar usuario",
+        lambda: abrir_ventana_registro(ventana_inicio),
+        ancho=24,
+        color_fondo=COLOR_BOTON_SECUNDARIO
     )
     boton_registro.pack(pady=8)
 
-    boton_login = tk.Button(
-        ventana_inicio,
-        text="Iniciar partida",
-        width=25,
-        height=2,
-        command=lambda: abrir_ventana_login(ventana_inicio)
+    boton_login = crear_boton_estilizado(
+        panel,
+        "Iniciar partida",
+        lambda: abrir_ventana_login(ventana_inicio),
+        ancho=24,
+        color_fondo=COLOR_BOTON
     )
     boton_login.pack(pady=8)
 
-    boton_ranking = tk.Button(
-        ventana_inicio,
-        text="Ver ranking",
-        width=25,
-        height=2,
-        command=lambda: abrir_ventana_ranking(ventana_inicio)
+    boton_ranking = crear_boton_estilizado(
+        panel,
+        "Ver ranking",
+        lambda: abrir_ventana_ranking(ventana_inicio),
+        ancho=24,
+        color_fondo=COLOR_BOTON_SECUNDARIO
     )
     boton_ranking.pack(pady=8)
 
-    boton_salir = tk.Button(
-        ventana_inicio,
-        text="Salir",
-        width=25,
-        height=2,
-        command=ventana_inicio.destroy
+    boton_salir = crear_boton_estilizado(
+        panel,
+        "Salir",
+        ventana_inicio.destroy,
+        ancho=24,
+        color_fondo=COLOR_BOTON_ALERTA
     )
     boton_salir.pack(pady=8)
 
