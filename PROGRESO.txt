@@ -28,3 +28,38 @@ Se agregó la pantalla de selección de facciones antes de abrir el mapa. La pan
 Siguiente paso:
 
 Integrar esta parte jugable con el login, registro, ranking y actualización de victorias.
+
+
+
+
+
+## Avance integrante 1 - Sistema de usuarios
+
+Se implementó el sistema de usuarios del proyecto Defensa y Asalto de Base en Python con Tkinter y almacenamiento en archivo JSON.
+
+Funcionalidades completadas:
+
+* Creación automática de la carpeta datos si no existe.
+* Creación automática del archivo usuarios.json.
+* Clase Jugador con usuario, contraseña, victorias como defensor y victorias como atacante.
+* Funciones para cargar la información de usuarios desde el archivo JSON.
+* Funciones para guardar la información de usuarios en el archivo JSON.
+* Función para registrar nuevos jugadores.
+* Validación para evitar registrar usuarios repetidos.
+* Función para validar inicio de sesión con usuario y contraseña.
+* Ventana inicial con opciones de registro, login y ranking.
+* Ventana de registro de nuevos jugadores.
+* Ventana de login para iniciar sesión con dos jugadores diferentes.
+* Validación para impedir que ambos jugadores sean el mismo usuario.
+* Ranking de jugadores con top 5 como defensor.
+* Ranking de jugadores con top 5 como atacante.
+* Actualización automática de victorias al finalizar una partida.
+* Cambio del arranque del programa para que el juego inicie desde el sistema de usuarios.
+
+Último avance realizado:
+
+Se conectó el inicio del programa con el sistema de usuarios. Ahora el juego no inicia directamente en la parte jugable, sino que primero muestra una ventana principal donde los jugadores pueden registrarse, iniciar sesión o consultar el ranking. También se implementó el login para dos jugadores diferentes y la actualización de victorias según el rol del jugador ganador.
+
+Siguiente paso:
+
+Integrar el sistema de usuarios con la pantalla de selección de facciones y la parte jugable. Después del login, los nombres de los jugadores deben enviarse a la pantalla previa para escoger quién será defensor, quién será atacante y qué facción usará cada uno. Al finalizar la partida, se debe actualizar automáticamente la victoria del jugador ganador en el ranking correspondiente.
