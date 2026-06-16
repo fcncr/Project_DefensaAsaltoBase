@@ -728,91 +728,78 @@ def abrir_ventana_login(ventana_inicio):
 
     entrada_usuario_1.focus()
 
-    # Función interna para validar los dos inicios de sesión.
-    def accion_iniciar_partida():
-        usuario_1 = entrada_usuario_1.get().strip()
-        contrasena_1 = entrada_contrasena_1.get().strip()
-
-        usuario_2 = entrada_usuario_2.get().strip()
-        contrasena_2 = entrada_contrasena_2.get().strip()
-
-        if usuario_1 == usuario_2:
-            etiqueta_mensaje.config(
-                text="Los jugadores deben ser usuarios diferentes.",
-                fg="red"
-            )
-            return
-
-        login_1, jugador_1, mensaje_1 = validar_login(usuario_1, contrasena_1)
-
-        if not login_1:
-            etiqueta_mensaje.config(
-                text="Jugador 1: " + mensaje_1,
-                fg="red"
-            )
-            return
-
-        login_2, jugador_2, mensaje_2 = validar_login(usuario_2, contrasena_2)
-
-        if not login_2:
-            etiqueta_mensaje.config(
-                text="Jugador 2: " + mensaje_2,
-                fg="red"
-            )
-            return
-
-        ventana_login.destroy()
-        ventana_inicio.destroy()
-
-        abrir_ventana_seleccion_facciones(
-            jugador_1.nombre_usuario,
-            jugador_2.nombre_usuario
-        )
-
-    boton_iniciar = tk.Button(
-        ventana_login,
-        text="Continuar",
-        width=20,
-        height=2,
-        command=accion_iniciar_partida
-    )
-    boton_iniciar.pack(pady=10)
-
-
 # Función para abrir la ventana de ranking.
 # Muestra top 5 de defensores y top 5 de atacantes.
 def abrir_ventana_ranking(ventana_padre):
     ventana_ranking = tk.Toplevel(ventana_padre)
     ventana_ranking.title("Ranking de jugadores")
-    ventana_ranking.geometry("620x430")
+    ventana_ranking.geometry("680x460")
     ventana_ranking.resizable(False, False)
+    ventana_ranking.config(bg=COLOR_FONDO_APP)
+    ventana_ranking.grab_set()
 
     titulo = tk.Label(
         ventana_ranking,
         text="Ranking de jugadores",
-        font=("Arial", 16, "bold")
+        font=("Arial", 22, "bold"),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TITULO
     )
-    titulo.pack(pady=15)
+    titulo.pack(pady=(25, 8))
 
-    frame_rankings = tk.Frame(ventana_ranking)
-    frame_rankings.pack(pady=10)
+    subtitulo = tk.Label(
+        ventana_ranking,
+        text="Top 5 de victorias por rol",
+        font=("Arial", 11),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TEXTO
+    )
+    subtitulo.pack(pady=(0, 15))
+
+    panel = tk.Frame(
+        ventana_ranking,
+        bg=COLOR_PANEL,
+        bd=1,
+        relief="solid"
+    )
+    panel.pack(padx=45, pady=10, fill="both", expand=True)
+
+    frame_rankings = tk.Frame(
+        panel,
+        bg=COLOR_PANEL
+    )
+    frame_rankings.pack(pady=(25, 15))
 
     # Ranking defensores
-    frame_defensores = tk.LabelFrame(
+    frame_defensores = tk.Frame(
         frame_rankings,
-        text="Top 5 defensores",
-        padx=15,
-        pady=10
+        bg=COLOR_ESTADO,
+        bd=1,
+        relief="solid"
     )
-    frame_defensores.grid(row=0, column=0, padx=15, sticky="n")
+    frame_defensores.grid(row=0, column=0, padx=18, sticky="n")
+
+    titulo_defensores = tk.Label(
+        frame_defensores,
+        text="Top defensores",
+        font=("Arial", 14, "bold"),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TITULO,
+        width=24
+    )
+    titulo_defensores.pack(pady=(14, 8))
 
     top_defensores = obtener_top_jugadores("defensor")
 
     if len(top_defensores) == 0:
         tk.Label(
             frame_defensores,
-            text="No hay jugadores registrados."
-        ).pack()
+            text="No hay jugadores registrados.",
+            font=("Arial", 10),
+            bg=COLOR_ESTADO,
+            fg=COLOR_TEXTO,
+            width=30
+        ).pack(pady=5)
 
     else:
         posicion = 1
@@ -823,28 +810,45 @@ def abrir_ventana_ranking(ventana_padre):
             tk.Label(
                 frame_defensores,
                 text=texto,
+                font=("Arial", 10, "bold"),
+                bg=COLOR_ESTADO,
+                fg=COLOR_TEXTO,
                 anchor="w",
-                width=30
-            ).pack(pady=3)
+                width=32
+            ).pack(pady=4, padx=12)
 
             posicion += 1
 
     # Ranking atacantes
-    frame_atacantes = tk.LabelFrame(
+    frame_atacantes = tk.Frame(
         frame_rankings,
-        text="Top 5 atacantes",
-        padx=15,
-        pady=10
+        bg=COLOR_ESTADO,
+        bd=1,
+        relief="solid"
     )
-    frame_atacantes.grid(row=0, column=1, padx=15, sticky="n")
+    frame_atacantes.grid(row=0, column=1, padx=18, sticky="n")
+
+    titulo_atacantes = tk.Label(
+        frame_atacantes,
+        text="Top atacantes",
+        font=("Arial", 14, "bold"),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TITULO,
+        width=24
+    )
+    titulo_atacantes.pack(pady=(14, 8))
 
     top_atacantes = obtener_top_jugadores("atacante")
 
     if len(top_atacantes) == 0:
         tk.Label(
             frame_atacantes,
-            text="No hay jugadores registrados."
-        ).pack()
+            text="No hay jugadores registrados.",
+            font=("Arial", 10),
+            bg=COLOR_ESTADO,
+            fg=COLOR_TEXTO,
+            width=30
+        ).pack(pady=5)
 
     else:
         posicion = 1
@@ -855,625 +859,23 @@ def abrir_ventana_ranking(ventana_padre):
             tk.Label(
                 frame_atacantes,
                 text=texto,
+                font=("Arial", 10, "bold"),
+                bg=COLOR_ESTADO,
+                fg=COLOR_TEXTO,
                 anchor="w",
-                width=30
-            ).pack(pady=3)
+                width=32
+            ).pack(pady=4, padx=12)
 
             posicion += 1
 
-    boton_cerrar = tk.Button(
-        ventana_ranking,
-        text="Cerrar",
-        width=15,
-        command=ventana_ranking.destroy
+    boton_cerrar = crear_boton_estilizado(
+        panel,
+        "Volver",
+        ventana_ranking.destroy,
+        ancho=18,
+        color_fondo=COLOR_BOTON_SECUNDARIO
     )
-    boton_cerrar.pack(pady=20)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    boton_cerrar.pack(pady=(5, 20))
 
 #----------------------------------------------------------
 # MAPA, ENTIDADES, FACCIONES Y COMBATE
