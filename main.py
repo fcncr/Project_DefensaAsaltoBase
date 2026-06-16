@@ -733,7 +733,7 @@ def abrir_ventana_login(ventana_inicio):
 def abrir_ventana_ranking(ventana_padre):
     ventana_ranking = tk.Toplevel(ventana_padre)
     ventana_ranking.title("Ranking de jugadores")
-    ventana_ranking.geometry("680x460")
+    ventana_ranking.geometry("755x460")
     ventana_ranking.resizable(False, False)
     ventana_ranking.config(bg=COLOR_FONDO_APP)
     ventana_ranking.grab_set()
@@ -4496,7 +4496,7 @@ def abrir_ventana_mapa():
 
     ventana_juego_actual = tk.Tk()
     ventana_juego_actual.title("Defensa y Asalto de Base")
-    ventana_juego_actual.geometry("1450x850")
+    ventana_juego_actual.geometry("1450x900")
     ventana_juego_actual.config(bg=COLOR_FONDO_APP)
 
     titulo = tk.Label(
@@ -4701,7 +4701,7 @@ def abrir_ventana_mapa():
         relief="solid",
         bd=1
     )
-    etiqueta_mensaje.pack(pady=10, fill="x")
+    #etiqueta_mensaje.pack(pady=10, fill="x")
     #etiqueta_mensaje.pack(pady=10)
 
     # Panel atacante
