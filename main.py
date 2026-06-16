@@ -1850,14 +1850,24 @@ def salir_del_juego():
 # Salidas: ninguna, actualiza etiquetas de estado e información
 def actualizar_estado_visual():
     if etiqueta_estado is not None:
-        seleccion_actual = obtener_texto_seleccion_actual()
+        if fase_actual == "defensor":
+            texto_turno = "Turno del defensor"
+        elif fase_actual == "atacante":
+            texto_turno = "Turno del atacante"
+        elif fase_actual == "combate":
+            texto_turno = "Combate en curso"
+        elif fase_actual == "fin_ronda":
+            texto_turno = "Ronda finalizada"
+        else:
+            texto_turno = ""
 
         etiqueta_estado.config(
-            text=f"Ronda: {numero_ronda}   |   Fase: {fase_actual.upper()}   |   "
-                 f"Marcador: Defensor {rondas_ganadas_defensor} - Atacante {rondas_ganadas_atacante}\n"
-                 f"Vida base: {base_central_actual.vida}   |   Seleccionado: {seleccion_actual}",
+            text=f"⚔ Ronda {numero_ronda}     "
+                 f"🛡 Defensor {rondas_ganadas_defensor}   VS   "
+                 f"Atacante {rondas_ganadas_atacante} ⚔\n"
+                 f"{texto_turno}",
             bg=COLOR_ESTADO,
-            fg=COLOR_TEXTO
+            fg=COLOR_TITULO
         )
 
     if etiqueta_info_defensor is not None:
@@ -1865,7 +1875,8 @@ def actualizar_estado_visual():
             text=f"Jugador: {NOMBRE_JUGADOR_DEFENSOR}\n"
                  f"Facción: {faccion_defensor_actual.nombre}\n"
                  f"Dinero: ${dinero_defensor}\n"
-                 f"Defensas colocadas: {contar_defensas_colocadas()}",
+                 f"Defensas colocadas: {contar_defensas_colocadas()}\n"
+                 f"Vida base: {base_central_actual.vida}",
             bg=COLOR_PANEL,
             fg=COLOR_TEXTO
         )
@@ -4422,11 +4433,11 @@ def abrir_ventana_mapa():
     etiqueta_estado = tk.Label(
         ventana_juego_actual,
         text="",
-        font=("Arial", 11, "bold"),
+        font=("Arial", 13, "bold"),
         bg=COLOR_ESTADO,
-        fg=COLOR_TEXTO,
-        padx=15,
-        pady=10,
+        fg=COLOR_TITULO,
+        padx=20,
+        pady=12,
         relief="solid",
         bd=1
     )
