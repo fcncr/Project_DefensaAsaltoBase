@@ -486,45 +486,7 @@ def abrir_ventana_registro(ventana_padre):
     boton_cerrar.grid(row=0, column=1, padx=6)
 
     entrada_usuario.focus()
-    # Función interna para registrar al usuario.
-    def accion_registrar():
-        nombre_usuario = entrada_usuario.get()
-        contrasena = entrada_contrasena.get()
-        confirmar = entrada_confirmar.get()
-
-        if contrasena != confirmar:
-            etiqueta_mensaje.config(
-                text="Las contraseñas no coinciden.",
-                fg="red"
-            )
-            return
-
-        registrado, mensaje = registrar_usuario(nombre_usuario, contrasena)
-
-        if registrado:
-            etiqueta_mensaje.config(
-                text=mensaje,
-                fg="green"
-            )
-
-            entrada_usuario.delete(0, tk.END)
-            entrada_contrasena.delete(0, tk.END)
-            entrada_confirmar.delete(0, tk.END)
-
-        else:
-            etiqueta_mensaje.config(
-                text=mensaje,
-                fg="red"
-            )
-
-    boton_registrar = tk.Button(
-        ventana_registro,
-        text="Registrar",
-        width=20,
-        command=accion_registrar
-    )
-    boton_registrar.pack(pady=10)
-
+    
 
 # Función para abrir la ventana de inicio de sesión.
 # Permite iniciar sesión con dos jugadores diferentes.
