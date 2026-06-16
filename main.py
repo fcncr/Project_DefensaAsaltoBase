@@ -910,6 +910,7 @@ COLOR_BOTON_TEXTO = "white"
 COLOR_BOTON_SECUNDARIO = "#A78A6A"
 COLOR_BOTON_ALERTA = "#7A3E2B"
 COLOR_ESTADO = "#DDD2C2"
+COLOR_BOTON_SELECCIONADO = "#5A4A3A"
 
 # Nombres temporales de jugadores
 NOMBRE_JUGADOR_DEFENSOR = "Jugador DefensorN"
@@ -1452,6 +1453,9 @@ boton_vender_atacante = None
 botones_defensor = []
 botones_atacante = []
 
+botones_defensa_por_tipo = {}
+botones_unidad_por_tipo = {}
+
 # -------------------------
 # Interfaz gráfica del mapa
 # -------------------------
@@ -1892,7 +1896,59 @@ def actualizar_estado_visual():
         )
 
     actualizar_botones_por_fase()
+    actualizar_estilo_botones_seleccion()
+    
+# Función para resaltar visualmente los botones seleccionados
+# Entradas: ninguna
+# Salidas: ninguna, actualiza colores de botones según la selección actual
+def actualizar_estilo_botones_seleccion():
+    for tipo_defensa, boton in botones_defensa_por_tipo.items():
+        if defensa_seleccionada == tipo_defensa:
+            boton.config(
+                bg=COLOR_BOTON_SELECCIONADO,
+                activebackground=COLOR_BOTON_SELECCIONADO
+            )
+        else:
+            boton.config(
+                bg=COLOR_BOTON,
+                activebackground=COLOR_BOTON
+            )
 
+    for tipo_unidad, boton in botones_unidad_por_tipo.items():
+        if unidad_seleccionada == tipo_unidad:
+            boton.config(
+                bg=COLOR_BOTON_SELECCIONADO,
+                activebackground=COLOR_BOTON_SELECCIONADO
+            )
+        else:
+            boton.config(
+                bg=COLOR_BOTON,
+                activebackground=COLOR_BOTON
+            )
+
+    if boton_vender_defensor is not None:
+        if modo_venta and fase_actual == "defensor":
+            boton_vender_defensor.config(
+                bg=COLOR_BOTON_SELECCIONADO,
+                activebackground=COLOR_BOTON_SELECCIONADO
+            )
+        else:
+            boton_vender_defensor.config(
+                bg=COLOR_BOTON_SECUNDARIO,
+                activebackground=COLOR_BOTON_SECUNDARIO
+            )
+
+    if boton_vender_atacante is not None:
+        if modo_venta and fase_actual == "atacante":
+            boton_vender_atacante.config(
+                bg=COLOR_BOTON_SELECCIONADO,
+                activebackground=COLOR_BOTON_SELECCIONADO
+            )
+        else:
+            boton_vender_atacante.config(
+                bg=COLOR_BOTON_SECUNDARIO,
+                activebackground=COLOR_BOTON_SECUNDARIO
+            )
 
 
 # Función para obtener el color del texto de una casilla
@@ -3200,7 +3256,7 @@ def actualizar_mapa_visual():
 
 # Función para seleccionar una defensa para colocar en el mapa
 # Entradas: tipo de defensa seleccionada
-# Salidas: ninguna, guarda la defensa seleccionada
+# Salidas: ninguna, guarda o cancela la defensa seleccionada
 def seleccionar_defensa(tipo_defensa):
     global defensa_seleccionada
     global unidad_seleccionada
@@ -3210,10 +3266,17 @@ def seleccionar_defensa(tipo_defensa):
         etiqueta_mensaje.config(text="No estás en la fase del defensor.")
         return
 
-    defensa_seleccionada = tipo_defensa
-    unidad_seleccionada = None
-    modo_venta = False
-    etiqueta_mensaje.config(text=f"Defensa seleccionada: {tipo_defensa}")
+    if defensa_seleccionada == tipo_defensa:
+        defensa_seleccionada = None
+        unidad_seleccionada = None
+        modo_venta = False
+        etiqueta_mensaje.config(text="Selección de defensa cancelada.")
+    else:
+        defensa_seleccionada = tipo_defensa
+        unidad_seleccionada = None
+        modo_venta = False
+        etiqueta_mensaje.config(text=f"Defensa seleccionada: {tipo_defensa}")
+
     actualizar_estado_visual()
 
 
@@ -3270,7 +3333,7 @@ def colocar_defensa(fila, columna):
 
 # Función para seleccionar una unidad para colocar en el mapa
 # Entradas: tipo de unidad seleccionada
-# Salidas: ninguna, guarda la unidad seleccionada
+# Salidas: ninguna, guarda o cancela la unidad seleccionada
 def seleccionar_unidad(tipo_unidad):
     global unidad_seleccionada
     global defensa_seleccionada
@@ -3280,11 +3343,17 @@ def seleccionar_unidad(tipo_unidad):
         etiqueta_mensaje.config(text="No estás en la fase del atacante.")
         return
 
-    unidad_seleccionada = tipo_unidad
-    defensa_seleccionada = None
-    modo_venta = False
+    if unidad_seleccionada == tipo_unidad:
+        unidad_seleccionada = None
+        defensa_seleccionada = None
+        modo_venta = False
+        etiqueta_mensaje.config(text="Selección de unidad cancelada.")
+    else:
+        unidad_seleccionada = tipo_unidad
+        defensa_seleccionada = None
+        modo_venta = False
+        etiqueta_mensaje.config(text=f"Unidad seleccionada: {tipo_unidad}")
 
-    etiqueta_mensaje.config(text=f"Unidad seleccionada: {tipo_unidad}")
     actualizar_estado_visual()
 
 # Función para colocar una unidad atacante en el mapa
@@ -3325,9 +3394,9 @@ def colocar_unidad(fila, columna):
     actualizar_mapa_visual()
 
 
-# Función para activar el modo venta
+# Función para activar o desactivar el modo venta
 # Entradas: ninguna
-# Salidas: ninguna, deja activo el modo venta hasta cancelar o seleccionar otra acción
+# Salidas: ninguna, activa o cancela el modo vender/quitar
 def activar_modo_venta():
     global modo_venta
     global defensa_seleccionada
@@ -3339,9 +3408,14 @@ def activar_modo_venta():
     if fase_actual != "defensor" and fase_actual != "atacante":
         return
 
-    modo_venta = True
-    defensa_seleccionada = None
-    unidad_seleccionada = None
+    if modo_venta:
+        modo_venta = False
+        etiqueta_mensaje.config(text="Modo vender cancelado.")
+    else:
+        modo_venta = True
+        defensa_seleccionada = None
+        unidad_seleccionada = None
+        etiqueta_mensaje.config(text="Modo vender activado. Haz clic sobre el objeto que deseas quitar.")
 
     actualizar_estado_visual()
 
@@ -4412,9 +4486,13 @@ def abrir_ventana_mapa():
     global ventana_juego_actual
     global boton_vender_defensor
     global boton_vender_atacante
+    global botones_defensa_por_tipo
+    global botones_unidad_por_tipo
 
     botones_defensor = []
     botones_atacante = []
+    botones_defensa_por_tipo = {}
+    botones_unidad_por_tipo = {}
 
     ventana_juego_actual = tk.Tk()
     ventana_juego_actual.title("Defensa y Asalto de Base")
@@ -4516,13 +4594,6 @@ def abrir_ventana_mapa():
     )
     boton_vender_defensor.pack(pady=6, padx=20)
 
-    boton_cancelar_defensor = crear_boton_estilizado(
-        panel_defensor,
-        "Cancelar selección",
-        cancelar_seleccion,
-        color_fondo=COLOR_BOTON_SECUNDARIO
-    )
-    boton_cancelar_defensor.pack(pady=6, padx=20)
 
     boton_terminar = crear_boton_estilizado(
         panel_defensor,
@@ -4543,13 +4614,19 @@ def abrir_ventana_mapa():
     )
     etiqueta_info_defensor.pack(pady=15)
 
+    botones_defensa_por_tipo = {
+        "Muro": boton_muro,
+        "Basica": boton_torre_basica,
+        "Pesada": boton_torre_pesada,
+        "Magica": boton_torre_magica
+    }
+
     botones_defensor = [
         boton_muro,
         boton_torre_basica,
         boton_torre_pesada,
         boton_torre_magica,
         boton_vender_defensor,
-        boton_cancelar_defensor,
         boton_terminar
     ]
 
@@ -4614,12 +4691,17 @@ def abrir_ventana_mapa():
     etiqueta_mensaje = tk.Label(
         panel_central,
         text="Selecciona una opción para comenzar.",
-        font=("Arial", 11),
-        bg=COLOR_FONDO_APP,
+        font=("Arial", 11, "bold"),
+        bg=COLOR_PANEL,
         fg=COLOR_TEXTO,
         wraplength=700,
-        justify="center"
+        justify="center",
+        padx=12,
+        pady=8,
+        relief="solid",
+        bd=1
     )
+    etiqueta_mensaje.pack(pady=10, fill="x")
     #etiqueta_mensaje.pack(pady=10)
 
     # Panel atacante
@@ -4678,13 +4760,6 @@ def abrir_ventana_mapa():
     )
     boton_vender_atacante.pack(pady=6, padx=20)
 
-    boton_cancelar_atacante = crear_boton_estilizado(
-        panel_atacante,
-        "Cancelar selección",
-        cancelar_seleccion,
-        color_fondo=COLOR_BOTON_SECUNDARIO
-    )
-    boton_cancelar_atacante.pack(pady=6, padx=20)
 
     etiqueta_info_atacante = tk.Label(
         panel_atacante,
@@ -4698,12 +4773,17 @@ def abrir_ventana_mapa():
     )
     etiqueta_info_atacante.pack(pady=15)
 
+    botones_unidad_por_tipo = {
+        "Soldado": boton_soldado,
+        "Tanque": boton_tanque,
+        "Rapida": boton_rapida
+    }
+
     botones_atacante = [
         boton_soldado,
         boton_tanque,
         boton_rapida,
         boton_vender_atacante,
-        boton_cancelar_atacante,
         boton_combate
     ]
 
