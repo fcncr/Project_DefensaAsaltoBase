@@ -17,6 +17,16 @@
     "2": {
         "contrasena": "2",
         "victorias_defensor": 0,
-        "victorias_atacante": 7
+        "victorias_atacante": 8
+    },
+    "Kendall C": {
+        "contrasena": "1234",
+        "victorias_defensor": 0,
+        "victorias_atacante": 1
+    },
+    "Fabian C": {
+        "contrasena": "1234",
+        "victorias_defensor": 0,
+        "victorias_atacante": 1
     }
 }

@@ -251,14 +251,6 @@ def abrir_ventana_inicio():
     )
     titulo.pack(pady=(35, 8))
 
-    subtitulo = tk.Label(
-        ventana_inicio,
-        text="Sistema de jugadores",
-        font=("Arial", 12, "bold"),
-        bg=COLOR_FONDO_APP,
-        fg=COLOR_TEXTO
-    )
-    subtitulo.pack(pady=(0, 18))
 
     panel = tk.Frame(
         ventana_inicio,
@@ -324,7 +316,7 @@ def abrir_ventana_inicio():
 def abrir_ventana_registro(ventana_padre):
     ventana_registro = tk.Toplevel(ventana_padre)
     ventana_registro.title("Registro de usuario")
-    ventana_registro.geometry("500x430")
+    ventana_registro.geometry("500x500")
     ventana_registro.resizable(False, False)
     ventana_registro.config(bg=COLOR_FONDO_APP)
     ventana_registro.grab_set()
@@ -896,6 +888,16 @@ LIMITE_TURNOS_COMBATE = 30
 BONO_DINERO_POR_RONDA = 50
 RONDAS_PARA_GANAR = 3
 
+RECOMPENSA_DEFENSOR_POR_UNIDAD = {
+    "Soldado": 20,
+    "Tanque": 45,
+    "Unidad Rápida": 30
+}
+
+RECOMPENSA_ATACANTE_POR_10_DANIO_TORRE = 4
+RECOMPENSA_ATACANTE_POR_10_DANIO_BASE = 5
+RECOMPENSA_ATACANTE_DESTRUIR_TORRE = 30
+
 COLOR_FONDO_APP = "#EDE7DD"
 COLOR_PANEL = "#F8F5F0"
 COLOR_BORDE = "#C7B8A3"
@@ -1379,11 +1381,28 @@ mapa_juego, base_central_actual = crear_mapa_inicial()
 dinero_defensor = DINERO_INICIAL_DEFENSOR
 dinero_atacante = DINERO_INICIAL_ATACANTE
 
+dinero_defensor_inicio_ronda = DINERO_INICIAL_DEFENSOR
+dinero_atacante_inicio_ronda = DINERO_INICIAL_ATACANTE
+
+dinero_extra_defensor_siguiente_ronda = 0
+dinero_extra_atacante_siguiente_ronda = 0
+
 numero_ronda = 1
 rondas_ganadas_defensor = 0
 rondas_ganadas_atacante = 0
 
 partida_terminada = False
+
+
+# Función para guardar el dinero con el que inicia una ronda
+# Entradas: ninguna
+# Salidas: ninguna, actualiza las variables de dinero inicial de la ronda actual
+def guardar_dinero_inicio_ronda():
+    global dinero_defensor_inicio_ronda
+    global dinero_atacante_inicio_ronda
+
+    dinero_defensor_inicio_ronda = dinero_defensor
+    dinero_atacante_inicio_ronda = dinero_atacante
 
 # Función para reiniciar todos los datos principales de la partida
 # Entradas: ninguna
@@ -1404,11 +1423,20 @@ def reiniciar_estado_partida():
     global combate_en_progreso
     global turno_combate_actual
     global efectos_combate_pendientes
+    global dinero_extra_defensor_siguiente_ronda
+    global dinero_extra_atacante_siguiente_ronda
+    global dinero_defensor_inicio_ronda
+    global dinero_atacante_inicio_ronda
 
     mapa_juego, base_central_actual = crear_mapa_inicial()
-
+    dinero_extra_defensor_siguiente_ronda = 0
+    dinero_extra_atacante_siguiente_ronda = 0
     dinero_defensor = DINERO_INICIAL_DEFENSOR
     dinero_atacante = DINERO_INICIAL_ATACANTE
+
+    dinero_defensor_inicio_ronda = dinero_defensor
+    dinero_atacante_inicio_ronda = dinero_atacante
+
     combate_en_progreso = False
     turno_combate_actual = 1
     numero_ronda = 1
@@ -1649,7 +1677,8 @@ def reiniciar_ronda_actual():
     global combate_en_progreso
     global turno_combate_actual
     global efectos_combate_pendientes
-
+    global dinero_extra_defensor_siguiente_ronda
+    global dinero_extra_atacante_siguiente_ronda
 
     if partida_terminada:
         etiqueta_mensaje.config(text="La partida ya terminó. No se puede reiniciar la ronda.")
@@ -1657,9 +1686,10 @@ def reiniciar_ronda_actual():
 
     mapa_juego, base_central_actual = crear_mapa_inicial()
 
-    dinero_defensor = DINERO_INICIAL_DEFENSOR + ((numero_ronda - 1) * BONO_DINERO_POR_RONDA)
-    dinero_atacante = DINERO_INICIAL_ATACANTE + ((numero_ronda - 1) * BONO_DINERO_POR_RONDA)
-
+    dinero_defensor = dinero_defensor_inicio_ronda
+    dinero_atacante = dinero_atacante_inicio_ronda
+    dinero_extra_defensor_siguiente_ronda = 0
+    dinero_extra_atacante_siguiente_ronda = 0
     combate_en_progreso = False
     turno_combate_actual = 1
     efectos_combate_pendientes = []
@@ -3622,19 +3652,78 @@ def ejecutar_ataque_torre_con_habilidad(torre, fila_torre, columna_torre):
     else:
         unidad.recibir_danio(torre.danio)
 
+
+# Función para obtener la recompensa del defensor según la unidad derrotada
+# Entradas: unidad derrotada
+# Salidas: cantidad de dinero que gana el defensor para la siguiente ronda
+def obtener_recompensa_defensor_por_unidad(unidad):
+    return RECOMPENSA_DEFENSOR_POR_UNIDAD.get(unidad.nombre, unidad.costo // 2)
+
+
+# Función para sumar dinero extra al defensor por eliminar una unidad
+# Entradas: unidad derrotada
+# Salidas: ninguna, acumula dinero para la siguiente ronda
+def sumar_recompensa_defensor_por_unidad(unidad):
+    global dinero_extra_defensor_siguiente_ronda
+
+    recompensa = obtener_recompensa_defensor_por_unidad(unidad)
+    dinero_extra_defensor_siguiente_ronda += recompensa
+
+    registrar_evento_combate(
+        f"Defensor gana ${recompensa} para la siguiente ronda por eliminar {unidad.nombre}."
+    )
+
+
+# Función para calcular recompensa según daño realizado
+# Entradas: daño real causado y recompensa por cada 10 puntos de daño
+# Salidas: cantidad de dinero ganado
+def calcular_recompensa_por_danio(danio_real, recompensa_por_10):
+    if danio_real <= 0:
+        return 0
+
+    return max(recompensa_por_10, (danio_real // 10) * recompensa_por_10)
+
+
+# Función para sumar dinero extra al atacante por dañar torres o base
+# Entradas: objetivo atacado, daño real causado y si el objetivo fue destruido
+# Salidas: ninguna, acumula dinero para la siguiente ronda
+def sumar_recompensa_atacante_por_danio(objetivo, danio_real, objetivo_destruido):
+    global dinero_extra_atacante_siguiente_ronda
+
+    recompensa = 0
+
+    if isinstance(objetivo, Torre):
+        recompensa += calcular_recompensa_por_danio(
+            danio_real,
+            RECOMPENSA_ATACANTE_POR_10_DANIO_TORRE
+        )
+
+        if objetivo_destruido:
+            recompensa += RECOMPENSA_ATACANTE_DESTRUIR_TORRE
+
+    elif isinstance(objetivo, BaseCentral):
+        recompensa += calcular_recompensa_por_danio(
+            danio_real,
+            RECOMPENSA_ATACANTE_POR_10_DANIO_BASE
+        )
+
+    if recompensa > 0:
+        dinero_extra_atacante_siguiente_ronda += recompensa
+
+        registrar_evento_combate(
+            f"Atacante gana ${recompensa} para la siguiente ronda por daño realizado."
+        )
+
 # Función para eliminar unidades derrotadas del mapa
 # Entradas: ninguna
-# Salidas: ninguna, elimina unidades sin vida y suma dinero al defensor
+# Salidas: ninguna, elimina unidades sin vida y suma recompensa al defensor
 def eliminar_unidades_derrotadas():
-    global dinero_defensor
-
     for fila in range(TAMANIO_MAPA):
         for columna in range(TAMANIO_MAPA):
             objeto = mapa_juego[fila][columna]
 
             if isinstance(objeto, Unidad) and not objeto.esta_viva():
-                dinero_ganado = objeto.costo // 2
-                dinero_defensor += dinero_ganado
+                sumar_recompensa_defensor_por_unidad(objeto)
                 mapa_juego[fila][columna] = None
 
 # Función para actualizar los escudos temporales de las unidades
@@ -3773,7 +3862,7 @@ def buscar_posicion_unidad_objeto(unidad_buscada):
 
 # Función para hacer que una unidad ataque un objetivo
 # Entradas: unidad, objetivo, fila del objetivo y columna del objetivo
-# Salidas: ninguna, aplica daño al objetivo
+# Salidas: ninguna, aplica daño al objetivo y calcula recompensas del atacante
 def unidad_ataca_objetivo(unidad, objetivo, fila_objetivo, columna_objetivo):
     posicion_unidad = buscar_posicion_unidad_objeto(unidad)
 
@@ -3790,11 +3879,18 @@ def unidad_ataca_objetivo(unidad, objetivo, fila_objetivo, columna_objetivo):
         )
 
     cantidad_ataques = obtener_cantidad_ataques_unidad(unidad)
-    
 
     for ataque in range(cantidad_ataques):
         if isinstance(objetivo, BaseCentral):
+            vida_antes = objetivo.vida
             objetivo.recibir_danio(unidad.danio)
+            danio_real = max(0, vida_antes - objetivo.vida)
+
+            sumar_recompensa_atacante_por_danio(
+                objetivo,
+                danio_real,
+                not objetivo.esta_viva()
+            )
 
             if not objetivo.esta_viva():
                 return
@@ -3807,9 +3903,18 @@ def unidad_ataca_objetivo(unidad, objetivo, fila_objetivo, columna_objetivo):
                 return
 
         elif isinstance(objetivo, Torre):
+            vida_antes = objetivo.vida
             objetivo.recibir_danio(unidad.danio)
+            danio_real = max(0, vida_antes - objetivo.vida)
+            torre_destruida = not objetivo.esta_viva()
 
-            if not objetivo.esta_viva():
+            sumar_recompensa_atacante_por_danio(
+                objetivo,
+                danio_real,
+                torre_destruida
+            )
+
+            if torre_destruida:
                 mapa_juego[fila_objetivo][columna_objetivo] = None
                 return
 
@@ -3966,6 +4071,8 @@ def preparar_siguiente_ronda():
     global combate_en_progreso
     global turno_combate_actual
     global efectos_combate_pendientes
+    global dinero_extra_defensor_siguiente_ronda
+    global dinero_extra_atacante_siguiente_ronda
 
     if partida_terminada:
         etiqueta_mensaje.config(text="La partida ya terminó. No se pueden iniciar más rondas.")
@@ -3979,8 +4086,21 @@ def preparar_siguiente_ronda():
 
     mapa_juego, base_central_actual = crear_mapa_inicial()
 
-    dinero_defensor = DINERO_INICIAL_DEFENSOR + ((numero_ronda - 1) * BONO_DINERO_POR_RONDA)
-    dinero_atacante = DINERO_INICIAL_ATACANTE + ((numero_ronda - 1) * BONO_DINERO_POR_RONDA)
+    dinero_defensor = (
+    DINERO_INICIAL_DEFENSOR
+    + ((numero_ronda - 1) * BONO_DINERO_POR_RONDA)
+    + dinero_extra_defensor_siguiente_ronda
+    )
+
+    dinero_atacante = (
+        DINERO_INICIAL_ATACANTE
+        + ((numero_ronda - 1) * BONO_DINERO_POR_RONDA)
+        + dinero_extra_atacante_siguiente_ronda
+    )
+    guardar_dinero_inicio_ronda()
+    dinero_extra_defensor_siguiente_ronda = 0
+    dinero_extra_atacante_siguiente_ronda = 0
+
     efectos_combate_pendientes = []
     limpiar_efectos_combate()
 
