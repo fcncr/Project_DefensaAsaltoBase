@@ -489,85 +489,244 @@ def abrir_ventana_registro(ventana_padre):
     
 
 # Función para abrir la ventana de inicio de sesión.
-# Permite iniciar sesión con dos jugadores diferentes.
+# Permite iniciar sesión con dos jugadores diferentes antes de iniciar la partida.
 def abrir_ventana_login(ventana_inicio):
     ventana_login = tk.Toplevel(ventana_inicio)
     ventana_login.title("Inicio de sesión")
-    ventana_login.geometry("520x430")
+    ventana_login.geometry("680x520")
     ventana_login.resizable(False, False)
+    ventana_login.config(bg=COLOR_FONDO_APP)
+    ventana_login.grab_set()
 
     titulo = tk.Label(
         ventana_login,
-        text="Inicio de sesión de jugadores",
-        font=("Arial", 15, "bold")
+        text="Inicio de sesión",
+        font=("Arial", 22, "bold"),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TITULO
     )
-    titulo.pack(pady=15)
+    titulo.pack(pady=(25, 8))
 
     descripcion = tk.Label(
         ventana_login,
-        text="Ambos jugadores deben iniciar sesión antes de comenzar."
+        text="Ambos jugadores deben iniciar sesión antes de comenzar la partida.",
+        font=("Arial", 11),
+        bg=COLOR_FONDO_APP,
+        fg=COLOR_TEXTO
     )
-    descripcion.pack(pady=5)
+    descripcion.pack(pady=(0, 15))
 
-    frame = tk.Frame(ventana_login)
-    frame.pack(pady=15)
+    panel = tk.Frame(
+        ventana_login,
+        bg=COLOR_PANEL,
+        bd=1,
+        relief="solid"
+    )
+    panel.pack(padx=45, pady=10, fill="both", expand=True)
 
-    # Jugador 1
-    etiqueta_jugador_1 = tk.Label(
-        frame,
+    frame_jugadores = tk.Frame(
+        panel,
+        bg=COLOR_PANEL
+    )
+    frame_jugadores.pack(pady=(25, 10))
+
+    # Panel del jugador 1
+    panel_jugador_1 = tk.Frame(
+        frame_jugadores,
+        bg=COLOR_ESTADO,
+        bd=1,
+        relief="solid"
+    )
+    panel_jugador_1.grid(row=0, column=0, padx=15, pady=5, sticky="n")
+
+    titulo_jugador_1 = tk.Label(
+        panel_jugador_1,
         text="Jugador 1",
-        font=("Arial", 11, "bold")
+        font=("Arial", 13, "bold"),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TITULO
     )
-    etiqueta_jugador_1.grid(row=0, column=0, columnspan=2, pady=8)
+    titulo_jugador_1.pack(pady=(15, 8))
 
-    tk.Label(frame, text="Usuario:").grid(row=1, column=0, padx=5, pady=5, sticky="e")
+    tk.Label(
+        panel_jugador_1,
+        text="Usuario:",
+        font=("Arial", 10, "bold"),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TEXTO
+    ).pack(pady=(5, 3))
 
     entrada_usuario_1 = tk.Entry(
-        frame,
-        width=25
+        panel_jugador_1,
+        width=25,
+        font=("Arial", 11),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO,
+        relief="flat",
+        bd=4
     )
-    entrada_usuario_1.grid(row=1, column=1, padx=5, pady=5)
+    entrada_usuario_1.pack(padx=18, pady=3)
 
-    tk.Label(frame, text="Contraseña:").grid(row=2, column=0, padx=5, pady=5, sticky="e")
+    tk.Label(
+        panel_jugador_1,
+        text="Contraseña:",
+        font=("Arial", 10, "bold"),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TEXTO
+    ).pack(pady=(10, 3))
 
     entrada_contrasena_1 = tk.Entry(
-        frame,
+        panel_jugador_1,
         width=25,
+        font=("Arial", 11),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO,
+        relief="flat",
+        bd=4,
         show="*"
     )
-    entrada_contrasena_1.grid(row=2, column=1, padx=5, pady=5)
+    entrada_contrasena_1.pack(padx=18, pady=(3, 18))
 
-    # Jugador 2
-    etiqueta_jugador_2 = tk.Label(
-        frame,
-        text="Jugador 2",
-        font=("Arial", 11, "bold")
+    # Panel del jugador 2
+    panel_jugador_2 = tk.Frame(
+        frame_jugadores,
+        bg=COLOR_ESTADO,
+        bd=1,
+        relief="solid"
     )
-    etiqueta_jugador_2.grid(row=3, column=0, columnspan=2, pady=15)
+    panel_jugador_2.grid(row=0, column=1, padx=15, pady=5, sticky="n")
 
-    tk.Label(frame, text="Usuario:").grid(row=4, column=0, padx=5, pady=5, sticky="e")
+    titulo_jugador_2 = tk.Label(
+        panel_jugador_2,
+        text="Jugador 2",
+        font=("Arial", 13, "bold"),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TITULO
+    )
+    titulo_jugador_2.pack(pady=(15, 8))
+
+    tk.Label(
+        panel_jugador_2,
+        text="Usuario:",
+        font=("Arial", 10, "bold"),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TEXTO
+    ).pack(pady=(5, 3))
 
     entrada_usuario_2 = tk.Entry(
-        frame,
-        width=25
+        panel_jugador_2,
+        width=25,
+        font=("Arial", 11),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO,
+        relief="flat",
+        bd=4
     )
-    entrada_usuario_2.grid(row=4, column=1, padx=5, pady=5)
+    entrada_usuario_2.pack(padx=18, pady=3)
 
-    tk.Label(frame, text="Contraseña:").grid(row=5, column=0, padx=5, pady=5, sticky="e")
+    tk.Label(
+        panel_jugador_2,
+        text="Contraseña:",
+        font=("Arial", 10, "bold"),
+        bg=COLOR_ESTADO,
+        fg=COLOR_TEXTO
+    ).pack(pady=(10, 3))
 
     entrada_contrasena_2 = tk.Entry(
-        frame,
+        panel_jugador_2,
         width=25,
+        font=("Arial", 11),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO,
+        relief="flat",
+        bd=4,
         show="*"
     )
-    entrada_contrasena_2.grid(row=5, column=1, padx=5, pady=5)
+    entrada_contrasena_2.pack(padx=18, pady=(3, 18))
 
     etiqueta_mensaje = tk.Label(
-        ventana_login,
+        panel,
         text="",
-        fg="red"
+        font=("Arial", 10, "bold"),
+        bg=COLOR_PANEL,
+        fg="red",
+        wraplength=520,
+        justify="center"
     )
-    etiqueta_mensaje.pack(pady=10)
+    etiqueta_mensaje.pack(pady=(5, 10))
+
+    # Función interna para validar los dos inicios de sesión.
+    def accion_iniciar_partida():
+        global JUGADOR_1_LOGUEADO
+        global JUGADOR_2_LOGUEADO
+
+        usuario_1 = entrada_usuario_1.get().strip()
+        contrasena_1 = entrada_contrasena_1.get().strip()
+
+        usuario_2 = entrada_usuario_2.get().strip()
+        contrasena_2 = entrada_contrasena_2.get().strip()
+
+        login_1, jugador_1, mensaje_1 = validar_login(usuario_1, contrasena_1)
+
+        if not login_1:
+            etiqueta_mensaje.config(
+                text="Jugador 1: " + mensaje_1,
+                fg="red"
+            )
+            return
+
+        login_2, jugador_2, mensaje_2 = validar_login(usuario_2, contrasena_2)
+
+        if not login_2:
+            etiqueta_mensaje.config(
+                text="Jugador 2: " + mensaje_2,
+                fg="red"
+            )
+            return
+
+        if jugador_1.nombre_usuario == jugador_2.nombre_usuario:
+            etiqueta_mensaje.config(
+                text="Los jugadores deben ser usuarios diferentes.",
+                fg="red"
+            )
+            return
+
+        JUGADOR_1_LOGUEADO = jugador_1.nombre_usuario
+        JUGADOR_2_LOGUEADO = jugador_2.nombre_usuario
+
+        ventana_login.destroy()
+        ventana_inicio.destroy()
+
+        abrir_ventana_seleccion_facciones(
+            JUGADOR_1_LOGUEADO,
+            JUGADOR_2_LOGUEADO
+        )
+
+    frame_botones = tk.Frame(
+        panel,
+        bg=COLOR_PANEL
+    )
+    frame_botones.pack(pady=(5, 18))
+
+    boton_continuar = crear_boton_estilizado(
+        frame_botones,
+        "Continuar",
+        accion_iniciar_partida,
+        ancho=16,
+        color_fondo=COLOR_BOTON
+    )
+    boton_continuar.grid(row=0, column=0, padx=8)
+
+    boton_volver = crear_boton_estilizado(
+        frame_botones,
+        "Volver",
+        ventana_login.destroy,
+        ancho=16,
+        color_fondo=COLOR_BOTON_SECUNDARIO
+    )
+    boton_volver.grid(row=0, column=1, padx=8)
+
+    entrada_usuario_1.focus()
 
     # Función interna para validar los dos inicios de sesión.
     def accion_iniciar_partida():
@@ -1353,6 +1512,10 @@ COLOR_ESTADO = "#DDD2C2"
 # Nombres temporales de jugadores
 NOMBRE_JUGADOR_DEFENSOR = "Jugador DefensorN"
 NOMBRE_JUGADOR_ATACANTE = "Jugador AtacanteN"
+
+# Jugadores que iniciaron sesión en el sistema
+JUGADOR_1_LOGUEADO = None
+JUGADOR_2_LOGUEADO = None
 
 # -------------------------
 # Clases base del juego
