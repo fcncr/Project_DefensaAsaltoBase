@@ -1980,18 +1980,6 @@ def actualizar_estilo_botones_seleccion():
                 activebackground=COLOR_BOTON_SECUNDARIO
             )
 
-
-# Función para obtener el color del texto de una casilla
-# Entradas: objeto guardado en una casilla
-# Salidas: color del texto que se mostrará en el botón
-def obtener_color_texto_casilla(objeto):
-    color_fondo = obtener_color_casilla(objeto)
-
-    if color_es_oscuro(color_fondo):
-        return COLOR_TEXTO_CLARO
-
-    return COLOR_TEXTO_OSCURO
-
 # Función para revisar si un color hexadecimal es oscuro
 # Entradas: color hexadecimal
 # Salidas: True si el color es oscuro, False si es claro
