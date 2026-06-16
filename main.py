@@ -1802,12 +1802,47 @@ def mostrar_resultado_partida(ganador, mensaje_resultado):
     boton_nueva_partida.grid(row=0, column=1, padx=8)
 
 
-# Función para cerrar la ventana del juego actual
+# Función para cerrar la ventana del juego actual y volver al menú principal
 # Entradas: ninguna
-# Salidas: ninguna, cierra la ventana principal del juego
+# Salidas: ninguna, reinicia referencias visuales y abre el menú inicial
 def salir_del_juego():
+    global ventana_juego_actual
+    global etiqueta_estado
+    global etiqueta_mensaje
+    global etiqueta_info_defensor
+    global etiqueta_info_atacante
+    global boton_siguiente_ronda
+    global boton_reiniciar_ronda
+    global boton_salir
+    global botones_defensor
+    global botones_atacante
+    global botones_mapa
+    global canvas_mapa
+    global boton_vender_defensor
+    global boton_vender_atacante
+
     if ventana_juego_actual is not None:
         ventana_juego_actual.destroy()
+
+    ventana_juego_actual = None
+    etiqueta_estado = None
+    etiqueta_mensaje = None
+    etiqueta_info_defensor = None
+    etiqueta_info_atacante = None
+
+    boton_siguiente_ronda = None
+    boton_reiniciar_ronda = None
+    boton_salir = None
+    boton_vender_defensor = None
+    boton_vender_atacante = None
+
+    botones_defensor = []
+    botones_atacante = []
+    botones_mapa = []
+    canvas_mapa = None
+
+    reiniciar_estado_partida()
+    abrir_ventana_inicio()
 
 
 # Función para actualizar el texto de estado de la partida
@@ -4558,7 +4593,7 @@ def abrir_ventana_mapa():
 
     boton_salir = crear_boton_estilizado(
         panel_acciones,
-        "Salir",
+        "Menú principal",
         salir_del_juego,
         ancho=18,
         color_fondo=COLOR_BOTON_ALERTA
